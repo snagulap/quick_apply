@@ -418,3 +418,187 @@
 /* ── UPLOAD ZONE ── */
 .qa-upload-zone { border:2px dashed #e5e7eb; border-radius:10px; padding:24px 16px; text-align:center; cursor:pointer; background:#fafafa; }
 .qa-upload-zone:hover { border-color:#16a34a; background:#f0fdf4; }
+
+/* ══ EMPTY STATE (LetMeApply koala style) ══ */
+.qa-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 20px 20px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+.qa-koala {
+  font-size: 72px;
+  line-height: 1;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.10));
+  animation: qa-float 3s ease-in-out infinite;
+}
+@keyframes qa-float {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+.qa-empty-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+.qa-empty-sub {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-bottom: 16px;
+}
+
+/* ══ JOB CARD ══ */
+.qa-job-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px 15px;
+  margin-bottom: 10px;
+}
+.qa-job-card-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+.qa-job-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 4px;
+}
+.qa-jc-quals {
+  font-size: 11px;
+  color: #374151;
+  line-height: 1;
+}
+.qa-qual-item {
+  padding: 3px 0;
+  font-size: 11px;
+  color: #374151;
+  line-height: 1.5;
+  border-bottom: 1px solid #f3f4f6;
+}
+.qa-qual-item:last-child { border-bottom: none; }
+.qa-expand-link {
+  font-size: 11px;
+  color: #16a34a;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 5px;
+}
+
+/* ══ SETTINGS NAV ══ */
+.qa-settings-nav {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+  flex-wrap: wrap;
+}
+.qa-settings-nav::-webkit-scrollbar { display: none; }
+.qa-snav-btn {
+  padding: 6px 11px;
+  border-radius: 20px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.qa-snav-btn:hover { border-color: #16a34a; color: #16a34a; background: #f0fdf4; }
+.qa-snav-btn.qa-active { background: #16a34a; color: #fff; border-color: #16a34a; }
+
+/* ══ SETTINGS SECTION BODY ══ */
+.qa-sec-body { padding-bottom: 80px; }
+.qa-sec-hdr { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f3f4f6; }
+.qa-sec-hdr-title { font-size: 18px; font-weight: 800; color: #111827; }
+.qa-sec-hdr-sub   { font-size: 12px; color: #9ca3af; margin-top: 3px; }
+.qa-sec-divider {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #9ca3af;
+  margin: 14px 0 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f3f4f6;
+}
+.qa-sec-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 13px 14px;
+}
+.qa-sec-card-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #6b7280;
+}
+
+/* ══ PROFILE AVATAR ══ */
+.qa-profile-avatar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+.qa-avatar-circle {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 14px rgba(22,163,74,0.30);
+}
+
+/* ══ BILLING BOX ══ */
+.qa-billing-plan-box {
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+}
+.qa-bp-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #9ca3af;
+  margin-bottom: 8px;
+}
+.qa-bp-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: #16a34a;
+  margin-bottom: 5px;
+}
+.qa-bp-desc {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.55;
+}
