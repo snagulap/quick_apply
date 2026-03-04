@@ -3,7 +3,7 @@
   'use strict';
   if (document.getElementById('qa-sidebar')) return;
 
-  const SERVER = 'https://your-server.onrender.com'; // ← update after deploy
+  const SERVER = 'https://quick-apply-2-qf7r.onrender.com';
 
   function getPlatform() {
     const h = location.hostname;
@@ -24,81 +24,74 @@
   sidebar.id = 'qa-sidebar';
   sidebar.innerHTML = `
 
-  <!-- ── LOGIN SCREEN ── -->
-  <div id="qa-screen-login" style="display:none;flex-direction:column;height:100%">
-    <div class="qa-hdr">
+  <!-- LOGIN SCREEN -->
+  <div id="qa-screen-login" class="qa-screen">
+    <div class="qa-auth-hdr">
       <div class="qa-logo"><div class="qa-logo-icon">Q</div><div class="qa-logo-name">Quick<span>Apply</span></div></div>
+      <button class="qa-close-btn" id="qa-auth-close">✕</button>
     </div>
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px">
-      <div style="width:52px;height:52px;background:#16a34a;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;margin-bottom:16px">Q</div>
-      <h2 style="font-size:20px;font-weight:800;color:#111827;margin-bottom:6px;text-align:center">Welcome to QuickApply</h2>
-      <p style="font-size:12px;color:#6b7280;text-align:center;margin-bottom:24px;line-height:1.5">Sign in to access your profiles,<br>applications and AI tools</p>
-      <div id="qa-login-err" class="qa-alert-err" style="display:none;margin-bottom:12px"></div>
-      <div id="qa-login-form" style="width:100%">
-        <div class="qa-field"><label>Email</label><input type="email" id="qa-l-email" placeholder="jane@example.com"/></div>
-        <div class="qa-field"><label>Password</label><input type="password" id="qa-l-pass" placeholder="••••••••"/></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:#374151;cursor:pointer">
-            <input type="checkbox" id="qa-remember" checked style="width:auto"/> Remember me
-          </label>
-          <span style="font-size:11px;color:#16a34a;cursor:pointer;font-weight:600" onclick="qaShowForgot()">Forgot password?</span>
+    <div class="qa-auth-body">
+      <div class="qa-auth-icon">Q</div>
+      <h2 class="qa-auth-title">Welcome to QuickApply</h2>
+      <p class="qa-auth-sub">Sign in to access your profiles, applications and AI tools</p>
+      <div id="qa-login-err" class="qa-alert-err" style="display:none;width:100%;margin-bottom:10px"></div>
+
+      <!-- LOGIN FORM -->
+      <div id="qa-form-login" style="width:100%">
+        <div class="qa-field"><label>Email</label><input type="email" id="qa-l-email" placeholder="jane@example.com" autocomplete="email"/></div>
+        <div class="qa-field"><label>Password</label><input type="password" id="qa-l-pass" placeholder="••••••••" autocomplete="current-password"/></div>
+        <div class="qa-auth-row">
+          <label class="qa-check-lbl"><input type="checkbox" id="qa-remember" checked/> Remember me</label>
+          <span class="qa-link" id="qa-to-forgot">Forgot password?</span>
         </div>
-        <button class="qa-btn qa-btn-green" id="qa-login-btn">Sign In</button>
-        <div style="text-align:center;margin-top:12px;font-size:11px;color:#6b7280">
-          No account? <span style="color:#16a34a;font-weight:700;cursor:pointer" onclick="qaShowSignup()">Create one free →</span>
-        </div>
+        <button class="qa-btn qa-btn-green" id="qa-login-btn" style="margin-top:4px">Sign In</button>
+        <p class="qa-auth-switch">No account? <span class="qa-link qa-link-bold" id="qa-to-signup">Create one free →</span></p>
       </div>
-      <div id="qa-signup-form" style="width:100%;display:none">
+
+      <!-- SIGNUP FORM -->
+      <div id="qa-form-signup" style="width:100%;display:none">
         <div class="qa-row">
-          <div class="qa-field"><label>First Name</label><input id="qa-s-fn" placeholder="Jane"/></div>
-          <div class="qa-field"><label>Last Name</label><input id="qa-s-ln" placeholder="Doe"/></div>
+          <div class="qa-field"><label>First Name</label><input id="qa-s-fn" placeholder="Jane" autocomplete="given-name"/></div>
+          <div class="qa-field"><label>Last Name</label><input id="qa-s-ln" placeholder="Doe" autocomplete="family-name"/></div>
         </div>
-        <div class="qa-field"><label>Email</label><input type="email" id="qa-s-email" placeholder="jane@example.com"/></div>
-        <div class="qa-field"><label>Password</label><input type="password" id="qa-s-pass" placeholder="Min 8 characters"/></div>
-        <div class="qa-field"><label>Confirm Password</label><input type="password" id="qa-s-pass2" placeholder="Repeat password"/></div>
-        <button class="qa-btn qa-btn-green" id="qa-signup-btn">Create Account</button>
-        <div style="text-align:center;margin-top:12px;font-size:11px;color:#6b7280">
-          Have an account? <span style="color:#16a34a;font-weight:700;cursor:pointer" onclick="qaShowLogin()">Sign in →</span>
-        </div>
+        <div class="qa-field"><label>Email</label><input type="email" id="qa-s-email" placeholder="jane@example.com" autocomplete="email"/></div>
+        <div class="qa-field"><label>Password</label><input type="password" id="qa-s-pass" placeholder="Min 8 characters" autocomplete="new-password"/></div>
+        <div class="qa-field"><label>Confirm Password</label><input type="password" id="qa-s-pass2" placeholder="Repeat password" autocomplete="new-password"/></div>
+        <button class="qa-btn qa-btn-green" id="qa-signup-btn">Create Free Account</button>
+        <p class="qa-auth-switch">Have an account? <span class="qa-link qa-link-bold" id="qa-to-login">Sign in →</span></p>
       </div>
-      <div id="qa-forgot-form" style="width:100%;display:none">
-        <p style="font-size:12px;color:#6b7280;margin-bottom:12px">Enter your email and we'll send reset instructions.</p>
+
+      <!-- FORGOT FORM -->
+      <div id="qa-form-forgot" style="width:100%;display:none">
+        <p style="font-size:12px;color:#6b7280;margin-bottom:12px;text-align:center">Enter your email and we'll send reset instructions.</p>
         <div class="qa-field"><label>Email</label><input type="email" id="qa-f-email" placeholder="jane@example.com"/></div>
         <button class="qa-btn qa-btn-green" id="qa-forgot-btn">Send Reset Email</button>
-        <div style="text-align:center;margin-top:12px">
-          <span style="font-size:11px;color:#16a34a;cursor:pointer;font-weight:600" onclick="qaShowLogin()">← Back to sign in</span>
-        </div>
+        <p class="qa-auth-switch"><span class="qa-link" id="qa-to-login2">← Back to sign in</span></p>
       </div>
     </div>
   </div>
 
-  <!-- ── MAIN APP ── -->
-  <div id="qa-screen-app" style="display:none;flex-direction:column;height:100%">
-
-    <!-- Header -->
+  <!-- MAIN APP -->
+  <div id="qa-screen-app" class="qa-screen" style="display:none">
     <div class="qa-hdr">
       <div class="qa-logo"><div class="qa-logo-icon">Q</div><div class="qa-logo-name">Quick<span>Apply</span></div></div>
       <div class="qa-hdr-right">
-        <div class="qa-credits-badge" id="qa-cred-badge" onclick="qaOpenPricing()">⚡ <span id="qa-cred-text">3 credits</span></div>
-        <button class="qa-plan-btn" id="qa-plan-btn" onclick="qaOpenPricing()">FREE</button>
-        <button class="qa-close-btn" onclick="document.getElementById('qa-sidebar').classList.remove('qa-open')" title="Close">✕</button>
+        <div class="qa-credits-badge" id="qa-cred-badge">⚡ <span id="qa-cred-text">3 credits</span></div>
+        <button class="qa-plan-btn" id="qa-plan-btn">FREE</button>
+        <button class="qa-close-btn" id="qa-app-close">✕</button>
       </div>
     </div>
 
-    <!-- Subscription renewal banner -->
     <div id="qa-renew-banner" class="qa-renew-banner" style="display:none">
-      <span>⚠️ Your subscription expires in <strong id="qa-renew-days">3</strong> days</span>
-      <button onclick="qaOpenPricing()">Renew →</button>
+      <span>⚠️ Expires in <strong id="qa-renew-days">3</strong> days</span>
+      <button id="qa-renew-btn">Renew →</button>
     </div>
 
-    <!-- Job context bar -->
     <div class="qa-job-bar">
-      <div class="qa-job-title" id="qa-job-title">Open a job posting to begin</div>
+      <div class="qa-job-title" id="qa-job-title">Detecting job...</div>
       <div class="qa-job-meta" id="qa-job-meta"><span>${PLATFORM}</span></div>
-      <button class="qa-reload-btn" id="qa-reload-btn">↻ Reload Job Details</button>
     </div>
 
-    <!-- Tabs -->
     <div class="qa-tabs">
       <div class="qa-tab qa-active" data-p="apply">Apply</div>
       <div class="qa-tab" data-p="cv">CV Align</div>
@@ -109,115 +102,130 @@
 
     <div class="qa-body">
 
-      <!-- ── APPLY TAB ── -->
+      <!-- APPLY TAB -->
       <div class="qa-panel qa-active" id="qa-p-apply">
-        <div class="qa-meter">
+
+        <!-- Job highlights card -->
+        <div class="qa-highlights-box" id="qa-highlights-box">
+          <div class="qa-highlights-title" id="qa-hl-title">Loading job details...</div>
+          <div class="qa-highlights-meta" id="qa-hl-meta"></div>
+          <div id="qa-hl-body" style="display:none">
+            <div class="qa-hl-section" id="qa-hl-skills-wrap" style="display:none">
+              <div class="qa-hl-label">Skills</div>
+              <div class="qa-pills" id="qa-hl-skills"></div>
+            </div>
+            <div class="qa-hl-section" id="qa-hl-quals-wrap" style="display:none">
+              <div class="qa-hl-label">Key Requirements</div>
+              <div id="qa-hl-quals" style="font-size:11px;color:#374151;line-height:1.8"></div>
+              <button class="qa-expand-btn" id="qa-hl-expand" style="display:none">+3 more</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active CV row -->
+        <div class="qa-cv-row">
+          <div class="qa-cv-row-label">Active CV</div>
+          <div id="qa-active-cv-chip" class="qa-active-cv-chip">
+            <span>📄</span>
+            <span id="qa-active-cv-name" class="qa-active-cv-text">No CV — add one in Settings</span>
+          </div>
+          <span class="qa-link" id="qa-switch-cv-btn" style="font-size:11px;white-space:nowrap">Switch</span>
+        </div>
+        <div id="qa-cv-switch-panel" style="display:none;margin-bottom:8px">
+          <div id="qa-cv-list" class="qa-cv-list"></div>
+        </div>
+
+        <!-- PRIMARY ACTIONS — LetMeApply style -->
+        <div class="qa-primary-row">
+          <button class="qa-btn qa-btn-green qa-btn-primary" id="qa-tailor-btn">
+            ✨ Tailor Resume <span class="qa-btn-hint">&lt; 30 sec</span>
+          </button>
+          <button class="qa-btn qa-btn-outline qa-btn-primary" id="qa-quick-cl-btn">
+            ✉️ Cover Letter
+          </button>
+        </div>
+
+        <!-- Output areas -->
+        <div class="qa-output" id="qa-tailor-out" style="display:none"></div>
+        <div id="qa-tailor-actions" class="qa-btn-row" style="display:none">
+          <button class="qa-btn qa-btn-outline" id="qa-tailor-copy">📋 Copy</button>
+          <button class="qa-btn qa-btn-green" id="qa-tailor-insert">📌 Insert</button>
+          <button class="qa-btn qa-btn-outline" id="qa-tailor-save">💾 Save as CV</button>
+        </div>
+        <div class="qa-output" id="qa-cl-apply-out" style="display:none"></div>
+        <div id="qa-cl-apply-actions" class="qa-btn-row" style="display:none">
+          <button class="qa-btn qa-btn-outline" id="qa-cl-apply-copy">📋 Copy</button>
+          <button class="qa-btn qa-btn-green" id="qa-cl-apply-insert">📌 Insert</button>
+        </div>
+
+        <!-- Credits meter -->
+        <div class="qa-meter" style="margin-top:10px">
           <div class="qa-meter-top">
             <span class="qa-meter-label">AI Credits</span>
             <span class="qa-meter-count" id="qa-meter-count">3 / 3</span>
           </div>
           <div class="qa-meter-bar"><div class="qa-meter-fill" id="qa-meter-fill" style="width:100%"></div></div>
-          <div class="qa-meter-hint">Free plan resets daily. <a onclick="qaOpenPricing()">Upgrade for unlimited →</a></div>
-        </div>
-
-        <!-- CV Profile selector -->
-        <div class="qa-card">
-          <div class="qa-card-title">🗂 Active CV Profile</div>
-          <div class="qa-cv-selector" id="qa-cv-selector">
-            <div style="font-size:11px;color:#6b7280;margin-bottom:8px">Select which CV to use for this application:</div>
-            <div id="qa-cv-list" class="qa-cv-list">
-              <div class="qa-empty">No CVs saved yet. Go to Settings → My CVs to add one.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="qa-card">
-          <div class="qa-card-title">📋 Auto-Fill Application</div>
-          <div class="qa-card-desc">Fill all form fields instantly from your saved profile.</div>
-          <button class="qa-btn qa-btn-green" id="qa-fill-btn">⚡ Auto-Fill This Page</button>
-        </div>
-
-        <div class="qa-card">
-          <div class="qa-card-title">✉️ Cover Letter <span class="qa-chip qa-chip-ai">AI</span></div>
-          <div class="qa-card-desc">Generate and insert a tailored cover letter for this job.</div>
-          <button class="qa-btn qa-btn-outline" id="qa-quick-cl-btn">✨ Generate &amp; Insert Cover Letter</button>
-          <div class="qa-output" id="qa-quick-cl-out"></div>
+          <div class="qa-meter-hint">Free resets daily · <span class="qa-link" id="qa-upgrade-link">Upgrade for unlimited →</span></div>
         </div>
       </div>
 
-      <!-- ── CV ALIGN TAB ── -->
+      <!-- CV ALIGN TAB -->
       <div class="qa-panel" id="qa-p-cv">
         <div class="qa-card">
           <div class="qa-card-title">📊 ATS Score <span class="qa-chip qa-chip-ai">AI</span></div>
-          <div class="qa-card-desc">Score your selected CV against this job's requirements.</div>
-
-          <!-- Job description - auto-fetched or manual -->
+          <div class="qa-card-desc">Score your CV against this job and see exactly what's missing.</div>
           <div class="qa-field">
-            <label style="display:flex;align-items:center;justify-content:space-between">
-              Job Description
-              <span style="color:#16a34a;font-size:10px;font-weight:700;cursor:pointer" id="qa-fetch-jd-btn">↻ Fetch from page</span>
+            <label style="display:flex;justify-content:space-between;align-items:center">
+              Job Description <span class="qa-link" id="qa-fetch-jd-btn" style="font-size:10px">↻ Fetch from page</span>
             </label>
-            <textarea id="qa-cv-jd" placeholder="Paste the job description here, or click 'Fetch from page' above..."></textarea>
+            <textarea id="qa-cv-jd" placeholder="Paste job description or click 'Fetch from page'..." style="min-height:90px"></textarea>
           </div>
-
-          <!-- CV selector for analysis -->
           <div class="qa-field">
-            <label>Select CV to Analyze</label>
-            <select id="qa-cv-pick-analyze">
-              <option value="">— choose a CV profile —</option>
-            </select>
+            <label>Select CV</label>
+            <select id="qa-cv-pick-analyze"><option value="">— choose a CV profile —</option></select>
           </div>
-
           <button class="qa-btn qa-btn-green" id="qa-analyze-btn">📊 Analyze &amp; Score</button>
-
           <div id="qa-ats-result" style="display:none">
             <div class="qa-ats-wrap">
               <div class="qa-ats-ring">
-                <svg viewBox="0 0 90 90">
-                  <circle class="qa-ring-bg" cx="45" cy="45" r="35"/>
-                  <circle class="qa-ring-fill" id="qa-ring" cx="45" cy="45" r="35"/>
-                </svg>
-                <div class="qa-ats-center">
-                  <span class="qa-ats-pct" id="qa-ats-pct">0%</span>
-                  <span class="qa-ats-sub">ATS Match</span>
-                </div>
+                <svg viewBox="0 0 90 90"><circle class="qa-ring-bg" cx="45" cy="45" r="35"/><circle class="qa-ring-fill" id="qa-ring" cx="45" cy="45" r="35"/></svg>
+                <div class="qa-ats-center"><span class="qa-ats-pct" id="qa-ats-pct">0%</span><span class="qa-ats-sub">ATS Match</span></div>
               </div>
               <div class="qa-ats-verdict" id="qa-ats-verdict"></div>
             </div>
-            <div class="qa-kw-label">Missing Keywords — click to copy</div>
+            <div class="qa-kw-label">Missing — click to copy</div>
             <div class="qa-pills" id="qa-kw-miss"></div>
-            <div class="qa-kw-label" style="margin-top:8px">Found in Your CV</div>
+            <div class="qa-kw-label" style="margin-top:8px">Present in CV</div>
             <div class="qa-pills" id="qa-kw-have"></div>
             <div style="margin-top:12px">
-              <button class="qa-btn qa-btn-gold" id="qa-rewrite-btn">✨ Rewrite CV to 100% Match <span class="qa-chip qa-chip-pro">PRO</span></button>
+              <button class="qa-btn qa-btn-gold" id="qa-rewrite-btn">✨ Rewrite to 100% Match <span class="qa-chip qa-chip-pro">PRO</span></button>
             </div>
             <div id="qa-rewrite-out" style="display:none;margin-top:10px">
-              <div style="font-size:12px;font-weight:700;color:#111827;margin-bottom:6px">Rewritten CV <span class="qa-chip qa-chip-ai">AI</span></div>
+              <div style="font-size:12px;font-weight:700;margin-bottom:6px">Rewritten CV <span class="qa-chip qa-chip-ai">AI</span> <span style="font-size:10px;color:#6b7280;font-weight:400">Green = added</span></div>
               <div class="qa-diff" id="qa-diff-box"></div>
               <div class="qa-btn-row">
                 <button class="qa-btn qa-btn-outline" id="qa-copy-cv-btn">📋 Copy</button>
-                <button class="qa-btn qa-btn-green" id="qa-insert-cv-btn">📌 Insert to Page</button>
-                <button class="qa-btn qa-btn-outline" id="qa-save-rewrite-btn">💾 Save as New CV</button>
+                <button class="qa-btn qa-btn-green" id="qa-insert-cv-btn">📌 Insert</button>
+                <button class="qa-btn qa-btn-outline" id="qa-save-rewrite-btn">💾 Save</button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ── AI TOOLS TAB ── -->
+      <!-- AI TOOLS TAB -->
       <div class="qa-panel" id="qa-p-ai">
         <div class="qa-card">
           <div class="qa-card-title">✨ Cover Letter <span class="qa-chip qa-chip-ai">AI</span> <span class="qa-chip qa-chip-free">FREE</span></div>
-          <div class="qa-card-desc">Generate a personalized cover letter. Uses the fetched job description or paste one below.</div>
+          <div class="qa-card-desc">Generate a tailored cover letter using the fetched job description.</div>
           <div class="qa-field">
-            <label style="display:flex;align-items:center;justify-content:space-between">
-              Job Description
-              <span style="color:#16a34a;font-size:10px;font-weight:700;cursor:pointer" id="qa-fetch-jd-ai">↻ Fetch from page</span>
+            <label style="display:flex;justify-content:space-between;align-items:center">
+              Job Description <span class="qa-link" id="qa-fetch-jd-ai" style="font-size:10px">↻ Fetch from page</span>
             </label>
-            <textarea id="qa-jd" placeholder="Paste job description or click 'Fetch from page'..."></textarea>
+            <textarea id="qa-jd" placeholder="Paste job description or click 'Fetch from page'..." style="min-height:80px"></textarea>
           </div>
           <button class="qa-btn qa-btn-green" id="qa-cl-btn">✨ Generate Cover Letter</button>
-          <div class="qa-output" id="qa-cl-out"></div>
+          <div class="qa-output" id="qa-cl-out" style="display:none"></div>
           <div class="qa-btn-row" id="qa-cl-actions" style="display:none">
             <button class="qa-btn qa-btn-outline" id="qa-copy-cl-btn">📋 Copy</button>
             <button class="qa-btn qa-btn-green" id="qa-insert-cl-btn">📌 Insert to Form</button>
@@ -225,19 +233,19 @@
         </div>
         <div class="qa-card">
           <div class="qa-card-title">🎯 ATS Keywords <span class="qa-chip qa-chip-free">FREE</span></div>
-          <div class="qa-card-desc">Extract top ATS keywords from the job description above.</div>
+          <div class="qa-card-desc">Extract the top ATS keywords from the job description above.</div>
           <button class="qa-btn qa-btn-outline" id="qa-kw-btn">🔍 Extract Keywords</button>
-          <div class="qa-output" id="qa-kw-out"></div>
+          <div class="qa-output" id="qa-kw-out" style="display:none"></div>
         </div>
         <div class="qa-card">
           <div class="qa-card-title">🎤 Interview Prep <span class="qa-chip qa-chip-pro">PRO</span></div>
-          <div class="qa-card-desc">Get likely interview questions and ideal STAR answers.</div>
+          <div class="qa-card-desc">Get likely interview Q&amp;A in STAR format for this role.</div>
           <button class="qa-btn qa-btn-outline" id="qa-int-btn">🎤 Generate Interview Q&amp;A</button>
-          <div class="qa-output" id="qa-int-out"></div>
+          <div class="qa-output" id="qa-int-out" style="display:none"></div>
         </div>
       </div>
 
-      <!-- ── TRACKER TAB ── -->
+      <!-- TRACKER TAB -->
       <div class="qa-panel" id="qa-p-tracker">
         <div class="qa-stats">
           <div class="qa-stat"><div class="qa-stat-num" id="qa-s-all">0</div><div class="qa-stat-lbl">Applied</div></div>
@@ -247,137 +255,105 @@
         </div>
         <div style="font-size:10px;color:#9ca3af;margin-bottom:8px">Click a status badge to cycle through stages</div>
         <div class="qa-jlist" id="qa-jlist"><div class="qa-empty">No applications yet. Start applying! 🎯</div></div>
-        <div style="margin-top:10px"><button class="qa-btn qa-btn-danger" id="qa-clear-btn">🗑 Clear All History</button></div>
+        <div style="margin-top:10px"><button class="qa-btn qa-btn-danger" id="qa-clear-btn">🗑 Clear History</button></div>
       </div>
 
-      <!-- ── SETTINGS TAB ── -->
+      <!-- SETTINGS TAB -->
       <div class="qa-panel" id="qa-p-settings">
-
-        <!-- Account -->
         <div class="qa-sec-label">Account</div>
-        <div class="qa-card" style="padding:11px 14px">
+        <div class="qa-card" style="padding:11px 14px;margin-bottom:10px">
           <div style="display:flex;align-items:center;justify-content:space-between">
-            <div>
-              <div style="font-size:12px;font-weight:700;color:#111827" id="qa-acct-name">Jane Doe</div>
-              <div style="font-size:11px;color:#6b7280" id="qa-acct-email">jane@example.com</div>
-            </div>
+            <div><div style="font-size:12px;font-weight:700" id="qa-acct-name">—</div><div style="font-size:11px;color:#6b7280" id="qa-acct-email">—</div></div>
             <button class="qa-btn qa-btn-danger" style="width:auto;padding:6px 12px;font-size:11px" id="qa-logout-btn">Sign Out</button>
           </div>
           <div style="margin-top:10px;padding-top:10px;border-top:1px solid #f3f4f6">
-            <div style="font-size:11px;font-weight:700;color:#111827" id="qa-sub-status">Free Plan</div>
+            <div style="font-size:11px;font-weight:700" id="qa-sub-status">Free Plan</div>
             <div style="font-size:10px;color:#6b7280;margin-top:2px" id="qa-sub-desc">3 credits/day</div>
-            <button class="qa-btn qa-btn-green" style="margin-top:8px" onclick="qaOpenPricing()">⭐ Upgrade Plan</button>
+            <button class="qa-btn qa-btn-green" style="margin-top:8px" id="qa-upgrade-settings-btn">⭐ Upgrade Plan</button>
           </div>
         </div>
 
-        <!-- My CVs -->
-        <div class="qa-sec-label" style="display:flex;align-items:center;justify-content:space-between">
-          My CV Profiles
-          <button class="qa-btn qa-btn-outline" style="width:auto;padding:4px 10px;font-size:10px" id="qa-add-cv-btn">+ Add CV</button>
+        <div class="qa-sec-label" style="display:flex;justify-content:space-between;align-items:center">
+          My CV Profiles <button class="qa-btn qa-btn-outline" style="width:auto;padding:4px 10px;font-size:10px" id="qa-add-cv-btn">+ Add CV</button>
         </div>
-        <div id="qa-cv-profiles-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
-          <div class="qa-empty" style="padding:16px 0">No CVs saved yet. Click "+ Add CV" to get started.</div>
-        </div>
+        <div id="qa-cv-profiles-list" style="margin-bottom:12px"><div class="qa-empty" style="padding:14px 0">No CVs yet. Click "+ Add CV" to start.</div></div>
 
-        <!-- Add/Edit CV form (hidden by default) -->
-        <div id="qa-cv-form" class="qa-card" style="display:none;border-color:#16a34a">
+        <!-- Add/Edit CV form -->
+        <div id="qa-cv-form" class="qa-card" style="display:none;border-color:#16a34a;margin-bottom:12px">
           <div class="qa-card-title" id="qa-cv-form-title">📄 Add New CV</div>
-          <div class="qa-field"><label>Profile Name (e.g. "Software Engineer", "Marketing")</label><input id="qa-cv-name" placeholder="e.g. Senior Developer Role"/></div>
+          <div class="qa-field"><label>Profile Name</label><input id="qa-cv-name" placeholder="e.g. Software Engineer, Marketing Manager"/></div>
           <div class="qa-field"><label>Target Job Title</label><input id="qa-cv-title" placeholder="e.g. Senior Software Engineer"/></div>
-
-          <!-- CV Input options -->
           <div style="margin-bottom:8px">
             <label style="font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">CV Content</label>
             <div style="display:flex;gap:6px;margin-bottom:8px">
-              <button class="qa-cv-input-tab active" data-cvtab="paste" id="qa-cvt-paste">Paste Text</button>
-              <button class="qa-cv-input-tab" data-cvtab="upload" id="qa-cvt-upload">Upload PDF/DOCX</button>
+              <button class="qa-cv-input-tab active" data-cvtab="paste">Paste Text</button>
+              <button class="qa-cv-input-tab" data-cvtab="upload">Upload PDF/DOCX</button>
             </div>
             <div id="qa-cvt-paste-panel">
-              <textarea id="qa-cv-text" style="width:100%;min-height:120px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:7px;font-family:inherit;font-size:11px;outline:none;resize:vertical;box-sizing:border-box" placeholder="Paste your full CV/resume text here..."></textarea>
+              <textarea id="qa-cv-text" style="width:100%;min-height:100px;padding:8px;border:1px solid #e5e7eb;border-radius:7px;font-size:11px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box" placeholder="Paste your full CV/resume text here..."></textarea>
             </div>
             <div id="qa-cvt-upload-panel" style="display:none">
               <div class="qa-upload-zone" id="qa-upload-zone">
-                <div style="font-size:24px;margin-bottom:8px">📄</div>
-                <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">Drop PDF or DOCX here</div>
-                <div style="font-size:10px;color:#9ca3af;margin-bottom:10px">or click to browse</div>
-                <button class="qa-btn qa-btn-outline" style="width:auto;padding:6px 14px;font-size:11px" onclick="document.getElementById('qa-file-input').click()">Browse Files</button>
+                <div style="font-size:28px;margin-bottom:6px">📄</div>
+                <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:3px">Drop PDF or DOCX here</div>
+                <div style="font-size:10px;color:#9ca3af;margin-bottom:8px">or click to browse</div>
+                <button class="qa-btn qa-btn-outline" style="width:auto;padding:6px 14px;font-size:11px" id="qa-browse-btn">Browse Files</button>
                 <input type="file" id="qa-file-input" accept=".pdf,.docx,.txt" style="display:none"/>
               </div>
               <div id="qa-upload-status" style="display:none;font-size:11px;color:#16a34a;margin-top:6px;text-align:center"></div>
             </div>
           </div>
-
           <div class="qa-field"><label>Skills (comma separated)</label><input id="qa-cv-skills" placeholder="React, Node.js, Python, AWS"/></div>
           <div class="qa-field"><label>Education</label><input id="qa-cv-edu" placeholder="B.S. Computer Science, MIT"/></div>
           <div class="qa-btn-row">
             <button class="qa-btn qa-btn-outline" id="qa-cv-cancel-btn">Cancel</button>
-            <button class="qa-btn qa-btn-green" id="qa-cv-save-btn">💾 Save CV Profile</button>
+            <button class="qa-btn qa-btn-green" id="qa-cv-save-btn">💾 Save CV</button>
           </div>
         </div>
 
-        <!-- Personal Info -->
         <div class="qa-sec-label">Personal Info</div>
-        <div class="qa-row">
-          <div class="qa-field"><label>First Name</label><input id="qa-fn" placeholder="Jane"/></div>
-          <div class="qa-field"><label>Last Name</label><input id="qa-ln" placeholder="Doe"/></div>
-        </div>
+        <div class="qa-row"><div class="qa-field"><label>First Name</label><input id="qa-fn" placeholder="Jane"/></div><div class="qa-field"><label>Last Name</label><input id="qa-ln" placeholder="Doe"/></div></div>
         <div class="qa-field"><label>Email</label><input type="email" id="qa-em" placeholder="jane@example.com"/></div>
-        <div class="qa-row">
-          <div class="qa-field"><label>Phone</label><input id="qa-ph" placeholder="+1 555 0000"/></div>
-          <div class="qa-field"><label>City</label><input id="qa-ci" placeholder="San Francisco"/></div>
-        </div>
-        <div class="qa-row">
-          <div class="qa-field"><label>State</label><input id="qa-st" placeholder="CA"/></div>
-          <div class="qa-field"><label>Zip</label><input id="qa-zp" placeholder="94105"/></div>
-        </div>
+        <div class="qa-row"><div class="qa-field"><label>Phone</label><input id="qa-ph" placeholder="+1 555 0000"/></div><div class="qa-field"><label>City</label><input id="qa-ci" placeholder="San Francisco"/></div></div>
+        <div class="qa-row"><div class="qa-field"><label>State</label><input id="qa-st" placeholder="CA"/></div><div class="qa-field"><label>Zip</label><input id="qa-zp" placeholder="94105"/></div></div>
         <div class="qa-field"><label>LinkedIn URL</label><input id="qa-li" placeholder="linkedin.com/in/janedoe"/></div>
-        <div class="qa-row">
-          <div class="qa-field"><label>Desired Salary</label><input id="qa-sl" placeholder="$120,000"/></div>
-          <div class="qa-field"><label>Job Title</label><input id="qa-jt" placeholder="Sr. Software Engineer"/></div>
-        </div>
+        <div class="qa-row"><div class="qa-field"><label>Job Title</label><input id="qa-jt" placeholder="Sr. Software Engineer"/></div><div class="qa-field"><label>Salary</label><input id="qa-sl" placeholder="$120,000"/></div></div>
 
         <div class="qa-sec-label">AI Configuration</div>
         <div class="qa-field"><label>Anthropic API Key</label><input type="password" id="qa-ak" placeholder="sk-ant-api03-..."/></div>
-        <div class="qa-api-note">Get a free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>. Stored locally only, never sent to our servers.</div>
+        <div class="qa-api-note">Get a free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> · Stored locally only</div>
 
         <div class="qa-sec-label">Preferences</div>
-        <div class="qa-toggle-row">
-          <div><div class="qa-toggle-label">Auto-fill on page load</div><div class="qa-toggle-desc">Fill forms automatically when a job page loads</div></div>
-          <div class="qa-toggle" id="qa-tog-auto"></div>
-        </div>
-        <div class="qa-toggle-row">
-          <div><div class="qa-toggle-label">Track applications</div><div class="qa-toggle-desc">Log every apply to the Tracker tab</div></div>
-          <div class="qa-toggle on" id="qa-tog-track"></div>
-        </div>
-        <div class="qa-toggle-row">
-          <div><div class="qa-toggle-label">Auto-fetch job descriptions</div><div class="qa-toggle-desc">Automatically extract job text when sidebar opens</div></div>
-          <div class="qa-toggle on" id="qa-tog-autofetch"></div>
-        </div>
-
-        <div style="margin-top:12px">
-          <button class="qa-btn qa-btn-green" id="qa-save-btn">💾 Save Settings</button>
-        </div>
-        <div class="qa-flash qa-flash-ok" id="qa-saved-flash">✓ Saved successfully!</div>
+        <div class="qa-toggle-row"><div><div class="qa-toggle-label">Auto-fill on page load</div><div class="qa-toggle-desc">Fill forms automatically when job page loads</div></div><div class="qa-toggle" id="qa-tog-auto"></div></div>
+        <div class="qa-toggle-row"><div><div class="qa-toggle-label">Track applications</div><div class="qa-toggle-desc">Log every apply to the Tracker tab</div></div><div class="qa-toggle on" id="qa-tog-track"></div></div>
+        <div class="qa-toggle-row"><div><div class="qa-toggle-label">Auto-fetch job description</div><div class="qa-toggle-desc">Extract job text when sidebar opens</div></div><div class="qa-toggle on" id="qa-tog-autofetch"></div></div>
+        <div style="margin-top:12px"><button class="qa-btn qa-btn-green" id="qa-save-btn">💾 Save Settings</button></div>
+        <div class="qa-flash qa-flash-ok" id="qa-saved-flash">✓ Saved!</div>
       </div>
 
     </div><!-- /body -->
 
-    <!-- Bottom action bar -->
+    <!-- BOTTOM BAR — LetMeApply style -->
     <div class="qa-bottom-bar">
-      <button class="qa-btn qa-btn-green" id="qa-bottom-fill">⚡ Auto-Fill</button>
-      <button class="qa-btn qa-btn-outline" id="qa-bottom-mark">✓ Mark Applied</button>
+      <div class="qa-bottom-stats">
+        <span>Jobs applied: <strong id="qa-stat-applied">0</strong></span>
+        <span>CVs tailored: <strong id="qa-stat-tailored">0</strong></span>
+      </div>
+      <div class="qa-bottom-actions">
+        <button class="qa-btn qa-btn-green" style="flex:2" id="qa-bottom-tailor">✨ Tailor Resume</button>
+        <button class="qa-btn qa-btn-outline" style="flex:1" id="qa-bottom-cl">Cover Letter</button>
+      </div>
+      <button class="qa-reload-btn" id="qa-reload-btn">↻ Reload Job Details</button>
+      <div style="text-align:center;font-size:10px;color:#9ca3af;padding-bottom:2px">Click 'Reload Job Details' on any job page</div>
     </div>
 
   </div><!-- /screen-app -->
 
-  <!-- ════ PRICING MODAL ════ -->
+  <!-- PRICING MODAL -->
   <div class="qa-overlay" id="qa-pricing">
     <div class="qa-modal">
-      <button class="qa-modal-close" onclick="qaClosePricing()">✕</button>
-      <div class="qa-modal-hdr">
-        <h2>Upgrade QuickApply</h2>
-        <p>Unlock unlimited AI features to land your dream job faster</p>
-      </div>
+      <button class="qa-modal-close" id="qa-pricing-close">✕</button>
+      <div class="qa-modal-hdr"><h2>Upgrade QuickApply</h2><p>Unlock unlimited AI features to land your dream job faster</p></div>
       <div class="qa-bill-toggle">
         <span class="qa-bill-lbl active" id="qa-b-mon">Monthly</span>
         <div class="qa-bill-sw" id="qa-bill-sw"></div>
@@ -385,84 +361,51 @@
       </div>
       <div class="qa-plan-cards">
         <div class="qa-plan-card">
-          <div class="qa-plan-row"><div class="qa-plan-name" style="color:#6b7280">Free</div>
-            <div><div class="qa-plan-price" style="color:#6b7280">$0</div><div class="qa-plan-period">forever</div></div></div>
-          <div class="qa-plan-tagline">3 credits/day · Basic features</div>
-          <div class="qa-plan-features">
-            <div class="qa-feat"><span class="qa-feat-y">✓</span> Auto-fill on all platforms</div>
-            <div class="qa-feat"><span class="qa-feat-y">✓</span> 1 CV profile</div>
-            <div class="qa-feat dim"><span class="qa-feat-n">✕</span> CV scoring &amp; rewrite</div>
-            <div class="qa-feat dim"><span class="qa-feat-n">✕</span> Multiple CV profiles</div>
-          </div>
+          <div class="qa-plan-row"><div class="qa-plan-name" style="color:#6b7280">Free</div><div><div class="qa-plan-price" style="color:#6b7280">$0</div><div class="qa-plan-period">forever</div></div></div>
+          <div class="qa-plan-tagline">3 credits/day · 1 CV profile</div>
+          <div class="qa-plan-features"><div class="qa-feat"><span class="qa-feat-y">✓</span> Auto-fill on all platforms</div><div class="qa-feat"><span class="qa-feat-y">✓</span> Cover letter generator</div><div class="qa-feat dim"><span class="qa-feat-n">✕</span> CV tailoring &amp; ATS scoring</div><div class="qa-feat dim"><span class="qa-feat-n">✕</span> Multiple CV profiles</div></div>
           <button class="qa-btn qa-btn-outline" disabled style="opacity:0.5">Current Plan</button>
         </div>
         <div class="qa-plan-card">
-          <div class="qa-plan-row"><div class="qa-plan-name">Starter</div>
-            <div><div class="qa-plan-price" id="qa-pr-s">$7.99</div><div class="qa-plan-period" id="qa-pp-s">/month</div></div></div>
+          <div class="qa-plan-row"><div class="qa-plan-name">Starter</div><div><div class="qa-plan-price" id="qa-pr-s">$7.99</div><div class="qa-plan-period" id="qa-pp-s">/month</div></div></div>
           <div class="qa-plan-tagline">50 credits/month · 3 CV profiles</div>
-          <div class="qa-plan-features">
-            <div class="qa-feat"><span class="qa-feat-y">✓</span> 50 AI credits/month</div>
-            <div class="qa-feat"><span class="qa-feat-y">✓</span> 3 CV profiles + PDF upload</div>
-            <div class="qa-feat"><span class="qa-feat-y">✓</span> CV ATS scoring</div>
-            <div class="qa-feat dim"><span class="qa-feat-n">✕</span> CV rewrite</div>
-          </div>
+          <div class="qa-plan-features"><div class="qa-feat"><span class="qa-feat-y">✓</span> 50 AI credits/month</div><div class="qa-feat"><span class="qa-feat-y">✓</span> 3 CV profiles + upload</div><div class="qa-feat"><span class="qa-feat-y">✓</span> ATS scoring</div><div class="qa-feat dim"><span class="qa-feat-n">✕</span> CV rewrite</div></div>
           <button class="qa-btn qa-btn-outline" id="qa-sel-starter">Get Starter →</button>
         </div>
         <div class="qa-plan-card highlighted popular">
-          <div class="qa-plan-row"><div class="qa-plan-name" style="color:#16a34a">Pro</div>
-            <div><div class="qa-plan-price" style="color:#16a34a" id="qa-pr-p">$14.99</div><div class="qa-plan-period" id="qa-pp-p">/month</div></div></div>
-          <div class="qa-plan-tagline">Unlimited credits · 10 CV profiles</div>
-          <div class="qa-plan-features">
-            <div class="qa-feat"><span class="qa-feat-y">✓</span> <strong>Unlimited AI credits</strong></div>
-            <div class="qa-feat"><span class="qa-feat-y">✓</span> <strong>10 CV profiles + PDF upload</strong></div>
-            <div class="qa-feat"><span class="qa-feat-y">✓</span> CV scoring &amp; rewrite to 100%</div>
-            <div class="qa-feat"><span class="qa-feat-y">✓</span> Interview Q&amp;A prep</div>
-          </div>
-          <button class="qa-btn qa-btn-green" id="qa-sel-pro">Get Pro → Most Popular</button>
+          <div class="qa-plan-row"><div class="qa-plan-name" style="color:#16a34a">Pro</div><div><div class="qa-plan-price" style="color:#16a34a" id="qa-pr-p">$14.99</div><div class="qa-plan-period" id="qa-pp-p">/month</div></div></div>
+          <div class="qa-plan-tagline">Unlimited credits · 10 CVs</div>
+          <div class="qa-plan-features"><div class="qa-feat"><span class="qa-feat-y">✓</span> <strong>Unlimited AI credits</strong></div><div class="qa-feat"><span class="qa-feat-y">✓</span> 10 CV profiles + upload</div><div class="qa-feat"><span class="qa-feat-y">✓</span> CV rewrite to 100% match</div><div class="qa-feat"><span class="qa-feat-y">✓</span> Interview Q&amp;A prep</div></div>
+          <button class="qa-btn qa-btn-green" id="qa-sel-pro">Get Pro →</button>
         </div>
         <div class="qa-plan-card">
-          <div class="qa-plan-row"><div class="qa-plan-name" style="color:#92400e">Ultra</div>
-            <div><div class="qa-plan-price" style="color:#92400e" id="qa-pr-u">$29.99</div><div class="qa-plan-period" id="qa-pp-u">/month</div></div></div>
-          <div class="qa-plan-tagline">Everything in Pro + power tools</div>
-          <div class="qa-plan-features">
-            <div class="qa-feat"><span class="qa-feat-y">✓</span> Unlimited CVs + bulk upload</div>
-            <div class="qa-feat"><span class="qa-feat-y">✓</span> Salary negotiation coach</div>
-            <div class="qa-feat"><span class="qa-feat-y">✓</span> LinkedIn profile optimizer</div>
-            <div class="qa-feat"><span class="qa-feat-y">✓</span> Priority AI &amp; support</div>
-          </div>
+          <div class="qa-plan-row"><div class="qa-plan-name" style="color:#92400e">Ultra</div><div><div class="qa-plan-price" style="color:#92400e" id="qa-pr-u">$29.99</div><div class="qa-plan-period" id="qa-pp-u">/month</div></div></div>
+          <div class="qa-plan-tagline">Everything + power tools</div>
+          <div class="qa-plan-features"><div class="qa-feat"><span class="qa-feat-y">✓</span> Unlimited CVs + bulk upload</div><div class="qa-feat"><span class="qa-feat-y">✓</span> Salary negotiation coach</div><div class="qa-feat"><span class="qa-feat-y">✓</span> LinkedIn optimizer</div><div class="qa-feat"><span class="qa-feat-y">✓</span> Priority support</div></div>
           <button class="qa-btn qa-btn-gold" id="qa-sel-ultra">Get Ultra →</button>
         </div>
       </div>
-
       <div class="qa-pay-section" id="qa-pay-section">
         <h3>💳 Complete Purchase</h3>
         <div class="qa-pay-summary">
-          <div><div class="qa-pay-plan-name" id="qa-pay-nm">Pro Plan</div><div class="qa-pay-billing" id="qa-pay-bl">Billed monthly · Cancel anytime</div></div>
+          <div><div class="qa-pay-plan-name" id="qa-pay-nm">Pro Plan</div><div class="qa-pay-billing" id="qa-pay-bl">Billed monthly</div></div>
           <div class="qa-pay-price" id="qa-pay-pr">$14.99</div>
         </div>
         <div class="qa-field"><label>Full Name</label><input id="qa-pay-fullname" placeholder="Jane Doe"/></div>
         <div class="qa-field"><label>Email</label><input type="email" id="qa-pay-email" placeholder="jane@example.com"/></div>
         <div class="qa-card-box">
-          <div class="qa-card-line"><label>Card No.</label><input id="qa-cn" placeholder="1234 5678 9012 3456" maxlength="19"/></div>
-          <div class="qa-card-line">
-            <label>Expires</label><input id="qa-ce" placeholder="MM / YY" maxlength="7" style="max-width:88px"/>
-            <label style="width:32px;padding-left:6px">CVC</label><input id="qa-cc" placeholder="123" maxlength="4" style="max-width:58px"/>
-          </div>
+          <div class="qa-card-line"><label>Card</label><input id="qa-cn" placeholder="1234 5678 9012 3456" maxlength="19"/></div>
+          <div class="qa-card-line"><label>Expires</label><input id="qa-ce" placeholder="MM / YY" maxlength="7" style="max-width:90px"/><label style="width:35px;padding-left:6px">CVC</label><input id="qa-cc" placeholder="123" maxlength="4" style="max-width:60px"/></div>
         </div>
-        <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#374151;margin-bottom:10px;cursor:pointer">
-          <input type="checkbox" id="qa-save-card" checked style="width:auto"/> Save card for future renewals
-        </label>
-        <div class="qa-secure-note">
-          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-          256-bit SSL · PCI-compliant · Powered by Stripe
-        </div>
+        <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#374151;margin-bottom:10px;cursor:pointer"><input type="checkbox" id="qa-save-card" checked style="width:auto"/> Save card for renewals</label>
+        <div class="qa-secure-note"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>256-bit SSL · Powered by Stripe</div>
         <button class="qa-btn qa-btn-green" id="qa-pay-btn">🔒 Subscribe Now</button>
         <div class="qa-flash" id="qa-pay-flash" style="margin-top:8px"></div>
-        <div class="qa-stripe-footer">Powered by <a href="https://stripe.com" target="_blank">Stripe</a> · Cancel anytime in Settings</div>
+        <div class="qa-stripe-footer">Powered by <a href="https://stripe.com" target="_blank">Stripe</a> · Cancel anytime</div>
       </div>
     </div>
   </div>
-  `;
+  `
 
   document.body.appendChild(sidebar);
   initApp();
@@ -471,214 +414,188 @@
   //  INIT
   // ════════════════════════════════════════════
   function initApp() {
-    // Check login state
-    chrome.storage.local.get(['qaUser','qaSession'], ({ qaUser, qaSession }) => {
-      if (qaUser && qaSession) {
-        showApp(qaUser);
-      } else {
-        showLogin();
-      }
+    // ── Auth navigation ──────────────────────────
+    const $ = id => sidebar.querySelector('#'+id);
+    function showForm(name) {
+      ['qa-form-login','qa-form-signup','qa-form-forgot'].forEach(id => $(id).style.display = 'none');
+      $('qa-form-'+name).style.display = 'block';
+      $('qa-login-err').style.display  = 'none';
+    }
+    $('qa-to-signup').addEventListener('click',  () => showForm('signup'));
+    $('qa-to-login').addEventListener('click',   () => showForm('login'));
+    $('qa-to-login2').addEventListener('click',  () => showForm('login'));
+    $('qa-to-forgot').addEventListener('click',  () => showForm('forgot'));
+    $('qa-auth-close').addEventListener('click', () => sidebar.classList.remove('qa-open'));
+    $('qa-app-close').addEventListener('click',  () => sidebar.classList.remove('qa-open'));
+
+    // ── Login ────────────────────────────────────
+    $('qa-login-btn').addEventListener('click', () => {
+      const email = $('qa-l-email').value.trim();
+      const pass  = $('qa-l-pass').value;
+      const err   = $('qa-login-err');
+      err.style.display = 'none';
+      if (!email || !pass) { err.textContent='Please enter email and password.'; err.style.display='block'; return; }
+      const btn = $('qa-login-btn'); btn.disabled=true; btn.textContent='Signing in...';
+      chrome.storage.local.get('qaAccounts', ({ qaAccounts }) => {
+        const accounts = qaAccounts||{}, key = btoa(email.toLowerCase()), stored = accounts[key];
+        if (!stored)                         { err.textContent='No account found. Please sign up first.'; err.style.display='block'; btn.disabled=false; btn.textContent='Sign In'; return; }
+        if (stored.passHash !== btoa(pass))  { err.textContent='Incorrect password. Try again.'; err.style.display='block'; btn.disabled=false; btn.textContent='Sign In'; return; }
+        const session = { token: btoa(Date.now()+email), expires: Date.now()+30*24*60*60*1000 };
+        chrome.storage.local.set({ qaUser: stored.user, qaSession: session }, () => { btn.disabled=false; showApp(stored.user); });
+      });
     });
 
-    // Tab switching
+    // ── Signup ───────────────────────────────────
+    $('qa-signup-btn').addEventListener('click', () => {
+      const fn    = $('qa-s-fn').value.trim();
+      const ln    = $('qa-s-ln').value.trim();
+      const email = $('qa-s-email').value.trim();
+      const pass  = $('qa-s-pass').value;
+      const pass2 = $('qa-s-pass2').value;
+      const err   = $('qa-login-err');
+      err.style.display = 'none';
+      if (!fn || !email || !pass) { err.textContent='Please fill in all fields.'; err.style.display='block'; return; }
+      if (pass.length < 8)        { err.textContent='Password must be at least 8 characters.'; err.style.display='block'; return; }
+      if (pass !== pass2)         { err.textContent='Passwords do not match.'; err.style.display='block'; return; }
+      const btn = $('qa-signup-btn'); btn.disabled=true; btn.textContent='Creating account...';
+      chrome.storage.local.get('qaAccounts', ({ qaAccounts }) => {
+        const accounts = qaAccounts||{}, key = btoa(email.toLowerCase());
+        if (accounts[key]) { err.textContent='An account with this email already exists.'; err.style.display='block'; btn.disabled=false; btn.textContent='Create Free Account'; return; }
+        const user = { firstName:fn, lastName:ln, email, createdAt:Date.now() };
+        accounts[key] = { user, passHash: btoa(pass) };
+        chrome.storage.local.set({ qaAccounts:accounts, qaUser:user, qaSession:{ token:btoa(Date.now()+email), expires:Date.now()+30*24*60*60*1000 }, profile:{ firstName:fn, lastName:ln, email } }, () => {
+          btn.disabled=false; showApp(user); toast('Welcome to QuickApply! 🎉','ok');
+        });
+      });
+    });
+
+    // ── Forgot ───────────────────────────────────
+    $('qa-forgot-btn').addEventListener('click', () => { toast('Reset email sent!','ok'); showForm('login'); });
+
+    // ── App tabs ─────────────────────────────────
     sidebar.querySelectorAll('.qa-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         sidebar.querySelectorAll('.qa-tab').forEach(t => t.classList.remove('qa-active'));
         sidebar.querySelectorAll('.qa-panel').forEach(p => p.classList.remove('qa-active'));
         tab.classList.add('qa-active');
-        sidebar.querySelector('#qa-p-' + tab.dataset.p).classList.add('qa-active');
-        if (tab.dataset.p === 'tracker') loadTracker();
+        $('qa-p-'+tab.dataset.p).classList.add('qa-active');
+        if (tab.dataset.p === 'tracker')  loadTracker();
         if (tab.dataset.p === 'settings') renderCVProfiles();
       });
     });
 
-    // Toggles
+    // ── Toggles ──────────────────────────────────
     sidebar.querySelectorAll('.qa-toggle').forEach(t => t.addEventListener('click', () => t.classList.toggle('on')));
 
-    // Buttons
-    sidebar.querySelector('#qa-reload-btn').addEventListener('click', () => { detectJob(); fetchJobDescription(true); });
-    sidebar.querySelector('#qa-fill-btn').addEventListener('click', () => doAutofill(true));
-    sidebar.querySelector('#qa-bottom-fill').addEventListener('click', () => doAutofill(true));
-    sidebar.querySelector('#qa-bottom-mark').addEventListener('click', markApplied);
-    sidebar.querySelector('#qa-quick-cl-btn').addEventListener('click', quickCoverLetter);
-    sidebar.querySelector('#qa-fetch-jd-btn').addEventListener('click', () => fetchJobDescription(true, 'qa-cv-jd'));
-    sidebar.querySelector('#qa-fetch-jd-ai').addEventListener('click', () => fetchJobDescription(true, 'qa-jd'));
-    sidebar.querySelector('#qa-analyze-btn').addEventListener('click', analyzeCV);
-    sidebar.querySelector('#qa-rewrite-btn').addEventListener('click', rewriteCV);
-    sidebar.querySelector('#qa-copy-cv-btn').addEventListener('click', () => navigator.clipboard.writeText(sidebar.querySelector('#qa-diff-box')?.textContent||'').then(()=>toast('Copied!','ok')));
-    sidebar.querySelector('#qa-insert-cv-btn').addEventListener('click', insertCVRewrite);
-    sidebar.querySelector('#qa-save-rewrite-btn').addEventListener('click', saveRewriteAsNewCV);
-    sidebar.querySelector('#qa-cl-btn').addEventListener('click', genCoverLetter);
-    sidebar.querySelector('#qa-copy-cl-btn').addEventListener('click', () => navigator.clipboard.writeText(sidebar.querySelector('#qa-cl-out')?.textContent||'').then(()=>toast('Copied!','ok')));
-    sidebar.querySelector('#qa-insert-cl-btn').addEventListener('click', insertCoverLetter);
-    sidebar.querySelector('#qa-kw-btn').addEventListener('click', extractKeywords);
-    sidebar.querySelector('#qa-int-btn').addEventListener('click', interviewPrep);
-    sidebar.querySelector('#qa-clear-btn').addEventListener('click', clearTracker);
-    sidebar.querySelector('#qa-save-btn').addEventListener('click', saveSettings);
-    sidebar.querySelector('#qa-logout-btn').addEventListener('click', logout);
-    sidebar.querySelector('#qa-add-cv-btn').addEventListener('click', showCVForm);
-    sidebar.querySelector('#qa-cv-cancel-btn').addEventListener('click', hideCVForm);
-    sidebar.querySelector('#qa-cv-save-btn').addEventListener('click', saveCV);
+    // ── Apply tab ────────────────────────────────
+    $('qa-reload-btn').addEventListener('click', () => { fetchJobDescription(true); populateHighlights(); });
+    $('qa-tailor-btn').addEventListener('click', tailorCV);
+    $('qa-bottom-tailor').addEventListener('click', tailorCV);
+    $('qa-quick-cl-btn').addEventListener('click', quickCoverLetter);
+    $('qa-bottom-cl').addEventListener('click', quickCoverLetter);
+    $('qa-tailor-copy').addEventListener('click', () => navigator.clipboard.writeText($('qa-tailor-out')?.textContent||'').then(()=>toast('Copied!','ok')));
+    $('qa-tailor-insert').addEventListener('click', () => {
+      const text = $('qa-tailor-out')?.textContent;
+      if (!text) return;
+      const ta = Array.from(document.querySelectorAll('textarea')).filter(t=>!t.closest('#qa-sidebar'));
+      if (ta.length) { setVal(ta[0],text); toast('CV inserted! ✓','ok'); } else toast('No text area on this page.','warn');
+    });
+    $('qa-tailor-save').addEventListener('click', () => saveTailoredAsCV($('qa-tailor-out')?.textContent));
+    $('qa-cl-apply-copy').addEventListener('click', () => navigator.clipboard.writeText($('qa-cl-apply-out')?.textContent||'').then(()=>toast('Copied!','ok')));
+    $('qa-cl-apply-insert').addEventListener('click', () => insertTextIntoForm($('qa-cl-apply-out')?.textContent));
+    $('qa-upgrade-link').addEventListener('click', openPricing);
+    $('qa-switch-cv-btn').addEventListener('click', () => {
+      const p = $('qa-cv-switch-panel'); p.style.display = p.style.display==='none'?'block':'none';
+    });
+
+    // ── CV Align tab ─────────────────────────────
+    $('qa-fetch-jd-btn').addEventListener('click', () => fetchJobDescription(true,'qa-cv-jd'));
+    $('qa-analyze-btn').addEventListener('click', analyzeCV);
+    $('qa-rewrite-btn').addEventListener('click', rewriteCV);
+    $('qa-copy-cv-btn').addEventListener('click', () => navigator.clipboard.writeText($('qa-diff-box')?.textContent||'').then(()=>toast('Copied!','ok')));
+    $('qa-insert-cv-btn').addEventListener('click', () => insertTextIntoForm($('qa-diff-box')?.textContent));
+    $('qa-save-rewrite-btn').addEventListener('click', () => saveTailoredAsCV($('qa-diff-box')?.textContent));
+
+    // ── AI Tools tab ─────────────────────────────
+    $('qa-fetch-jd-ai').addEventListener('click', () => fetchJobDescription(true,'qa-jd'));
+    $('qa-cl-btn').addEventListener('click', genCoverLetter);
+    $('qa-copy-cl-btn').addEventListener('click', () => navigator.clipboard.writeText($('qa-cl-out')?.textContent||'').then(()=>toast('Copied!','ok')));
+    $('qa-insert-cl-btn').addEventListener('click', () => insertTextIntoForm($('qa-cl-out')?.textContent));
+    $('qa-kw-btn').addEventListener('click', extractKeywords);
+    $('qa-int-btn').addEventListener('click', interviewPrep);
+
+    // ── Tracker tab ──────────────────────────────
+    $('qa-clear-btn').addEventListener('click', clearTracker);
+
+    // ── Settings tab ─────────────────────────────
+    $('qa-save-btn').addEventListener('click', saveSettings);
+    $('qa-logout-btn').addEventListener('click', logout);
+    $('qa-upgrade-settings-btn').addEventListener('click', openPricing);
+    $('qa-add-cv-btn').addEventListener('click', () => showCVForm(null));
+    $('qa-cv-cancel-btn').addEventListener('click', hideCVForm);
+    $('qa-cv-save-btn').addEventListener('click', saveCV);
+    $('qa-browse-btn').addEventListener('click', () => $('qa-file-input').click());
+    $('qa-file-input').addEventListener('change', handleFileUpload);
 
     // CV input tabs
     sidebar.querySelectorAll('.qa-cv-input-tab').forEach(btn => {
       btn.addEventListener('click', () => {
         sidebar.querySelectorAll('.qa-cv-input-tab').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        const tab = btn.dataset.cvtab;
-        sidebar.querySelector('#qa-cvt-paste-panel').style.display = tab === 'paste' ? 'block' : 'none';
-        sidebar.querySelector('#qa-cvt-upload-panel').style.display = tab === 'upload' ? 'block' : 'none';
+        $('qa-cvt-paste-panel').style.display = btn.dataset.cvtab==='paste' ? 'block' : 'none';
+        $('qa-cvt-upload-panel').style.display = btn.dataset.cvtab==='upload' ? 'block' : 'none';
       });
     });
 
-    // File upload
-    const fileInput = sidebar.querySelector('#qa-file-input');
-    const uploadZone = sidebar.querySelector('#qa-upload-zone');
-    fileInput.addEventListener('change', handleFileUpload);
-    uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.borderColor = '#16a34a'; uploadZone.style.background = '#f0fdf4'; });
-    uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = ''; uploadZone.style.background = ''; });
-    uploadZone.addEventListener('drop', e => {
-      e.preventDefault(); uploadZone.style.borderColor = ''; uploadZone.style.background = '';
-      if (e.dataTransfer.files[0]) handleFileUploadDirect(e.dataTransfer.files[0]);
-    });
+    const zone = $('qa-upload-zone');
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor='#16a34a'; zone.style.background='#f0fdf4'; });
+    zone.addEventListener('dragleave', () => { zone.style.borderColor=''; zone.style.background=''; });
+    zone.addEventListener('drop', e => { e.preventDefault(); zone.style.borderColor=''; zone.style.background=''; if(e.dataTransfer.files[0]) handleFileUploadDirect(e.dataTransfer.files[0]); });
 
-    // Pricing
-    sidebar.querySelector('#qa-bill-sw').addEventListener('click', toggleBilling);
-    sidebar.querySelector('#qa-b-mon').addEventListener('click', () => setBilling('monthly'));
-    sidebar.querySelector('#qa-b-ann').addEventListener('click', () => setBilling('annual'));
-    sidebar.querySelector('#qa-sel-starter').addEventListener('click', () => selectPlan('starter'));
-    sidebar.querySelector('#qa-sel-pro').addEventListener('click', () => selectPlan('pro'));
-    sidebar.querySelector('#qa-sel-ultra').addEventListener('click', () => selectPlan('ultra'));
-    sidebar.querySelector('#qa-pay-btn').addEventListener('click', processPayment);
-
-    // Card formatting
-    sidebar.querySelector('#qa-cn').addEventListener('input', e => { let v=e.target.value.replace(/\D/g,'').substring(0,16); e.target.value=v.replace(/(.{4})/g,'$1 ').trim(); });
-    sidebar.querySelector('#qa-ce').addEventListener('input', e => { let v=e.target.value.replace(/\D/g,'').substring(0,4); if(v.length>=2) v=v.substring(0,2)+' / '+v.substring(2); e.target.value=v; });
-
-    // Login / signup buttons wired via window functions below
+    // ── Pricing modal ────────────────────────────
+    $('qa-cred-badge').addEventListener('click', openPricing);
+    $('qa-plan-btn').addEventListener('click', openPricing);
+    $('qa-pricing-close').addEventListener('click', closePricing);
+    $('qa-renew-btn').addEventListener('click', openPricing);
+    $('qa-bill-sw').addEventListener('click', toggleBilling);
+    $('qa-b-mon').addEventListener('click', () => setBilling('monthly'));
+    $('qa-b-ann').addEventListener('click', () => setBilling('annual'));
+    $('qa-sel-starter').addEventListener('click', () => selectPlan('starter'));
+    $('qa-sel-pro').addEventListener('click',     () => selectPlan('pro'));
+    $('qa-sel-ultra').addEventListener('click',   () => selectPlan('ultra'));
+    $('qa-pay-btn').addEventListener('click', processPayment);
+    $('qa-cn').addEventListener('input', e => { let v=e.target.value.replace(/\D/g,'').substring(0,16); e.target.value=v.replace(/(.{4})/g,'$1 ').trim(); });
+    $('qa-ce').addEventListener('input', e => { let v=e.target.value.replace(/\D/g,'').substring(0,4); if(v.length>=2)v=v.substring(0,2)+' / '+v.substring(2); e.target.value=v; });
   }
 
   // ════════════════════════════════════════════
-  //  AUTH SCREENS
+  //  AUTH
   // ════════════════════════════════════════════
   function showLogin() {
     sidebar.querySelector('#qa-screen-login').style.display = 'flex';
-    sidebar.querySelector('#qa-screen-app').style.display = 'none';
-    qaShowLogin();
+    sidebar.querySelector('#qa-screen-app').style.display   = 'none';
   }
 
   function showApp(user) {
     sidebar.querySelector('#qa-screen-login').style.display = 'none';
-    sidebar.querySelector('#qa-screen-app').style.display = 'flex';
-    // Update account info
-    const nameEl = sidebar.querySelector('#qa-acct-name');
-    const emailEl = sidebar.querySelector('#qa-acct-email');
-    if (nameEl) nameEl.textContent = (user.firstName||'') + ' ' + (user.lastName||'');
-    if (emailEl) emailEl.textContent = user.email || '';
-    // Load everything
-    loadProfile();
-    updateCreditUI();
-    checkRenewal();
-    renderCVProfiles();
-    renderCVSelector();
-    detectJob();
+    sidebar.querySelector('#qa-screen-app').style.display   = 'flex';
+    const $ = id => sidebar.querySelector('#'+id);
+    if ($('qa-acct-name'))  $('qa-acct-name').textContent  = (user.firstName||'')+' '+(user.lastName||'');
+    if ($('qa-acct-email')) $('qa-acct-email').textContent = user.email||'';
+    loadProfile(); updateCreditUI(); checkRenewal();
+    renderCVProfiles(); renderCVSelector(); renderActiveCVChip();
+    detectJob(); updateStats();
     chrome.storage.local.get('settings', ({ settings }) => {
-      if (settings?.autoFetchJD !== false) fetchJobDescription(false);
-      if (settings?.autoFill) chrome.storage.local.get('profile', ({ profile }) => { if (profile?.firstName) setTimeout(() => doFill(profile, false), 1000); });
+      if (settings?.autoFetchJD !== false) setTimeout(() => { fetchJobDescription(false); populateHighlights(); }, 600);
+      if (settings?.autoFill) chrome.storage.local.get('profile', ({ profile }) => { if(profile?.firstName) setTimeout(()=>doFill(profile,false),1200); });
     });
   }
-
-  window.qaShowLogin = function() {
-    sidebar.querySelector('#qa-login-form').style.display = 'block';
-    sidebar.querySelector('#qa-signup-form').style.display = 'none';
-    sidebar.querySelector('#qa-forgot-form').style.display = 'none';
-  };
-  window.qaShowSignup = function() {
-    sidebar.querySelector('#qa-login-form').style.display = 'none';
-    sidebar.querySelector('#qa-signup-form').style.display = 'block';
-    sidebar.querySelector('#qa-forgot-form').style.display = 'none';
-  };
-  window.qaShowForgot = function() {
-    sidebar.querySelector('#qa-login-form').style.display = 'none';
-    sidebar.querySelector('#qa-signup-form').style.display = 'none';
-    sidebar.querySelector('#qa-forgot-form').style.display = 'block';
-  };
-
-  // Wire login button
-  sidebar.querySelector('#qa-login-btn').addEventListener('click', async () => {
-    const email = sidebar.querySelector('#qa-l-email').value.trim();
-    const pass  = sidebar.querySelector('#qa-l-pass').value;
-    const errEl = sidebar.querySelector('#qa-login-err');
-    errEl.style.display = 'none';
-    if (!email || !pass) { errEl.textContent = 'Please enter email and password.'; errEl.style.display = 'block'; return; }
-    const btn = sidebar.querySelector('#qa-login-btn');
-    btn.disabled = true; btn.textContent = 'Signing in...';
-    // Local auth — store credentials encrypted-ish
-    chrome.storage.local.get('qaAccounts', ({ qaAccounts }) => {
-      const accounts = qaAccounts || {};
-      const key = btoa(email.toLowerCase());
-      const stored = accounts[key];
-      if (!stored) {
-        errEl.textContent = 'No account found. Please sign up first.';
-        errEl.style.display = 'block';
-        btn.disabled = false; btn.textContent = 'Sign In'; return;
-      }
-      if (stored.passHash !== btoa(pass)) {
-        errEl.textContent = 'Incorrect password. Please try again.';
-        errEl.style.display = 'block';
-        btn.disabled = false; btn.textContent = 'Sign In'; return;
-      }
-      const session = { token: btoa(Date.now() + email), expires: Date.now() + 30*24*60*60*1000 };
-      const remember = sidebar.querySelector('#qa-remember').checked;
-      const saveData = { qaUser: stored.user, qaSession: session };
-      if (remember) {
-        chrome.storage.local.set(saveData, () => { btn.disabled=false; showApp(stored.user); });
-      } else {
-        chrome.storage.session ? chrome.storage.session.set(saveData, () => { btn.disabled=false; showApp(stored.user); })
-          : chrome.storage.local.set(saveData, () => { btn.disabled=false; showApp(stored.user); });
-      }
-    });
-  });
-
-  // Wire signup button
-  sidebar.querySelector('#qa-signup-btn').addEventListener('click', () => {
-    const fn = sidebar.querySelector('#qa-s-fn').value.trim();
-    const ln = sidebar.querySelector('#qa-s-ln').value.trim();
-    const email = sidebar.querySelector('#qa-s-email').value.trim();
-    const pass  = sidebar.querySelector('#qa-s-pass').value;
-    const pass2 = sidebar.querySelector('#qa-s-pass2').value;
-    const errEl = sidebar.querySelector('#qa-login-err');
-    errEl.style.display = 'none';
-    if (!fn || !email || !pass) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return; }
-    if (pass.length < 8)        { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
-    if (pass !== pass2)         { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
-    const btn = sidebar.querySelector('#qa-signup-btn');
-    btn.disabled = true; btn.textContent = 'Creating account...';
-    chrome.storage.local.get('qaAccounts', ({ qaAccounts }) => {
-      const accounts = qaAccounts || {};
-      const key = btoa(email.toLowerCase());
-      if (accounts[key]) { errEl.textContent = 'An account with this email already exists.'; errEl.style.display = 'block'; btn.disabled=false; btn.textContent='Create Account'; return; }
-      const user = { firstName:fn, lastName:ln, email, createdAt: Date.now() };
-      accounts[key] = { user, passHash: btoa(pass) };
-      const session = { token: btoa(Date.now()+email), expires: Date.now()+30*24*60*60*1000 };
-      chrome.storage.local.set({ qaAccounts: accounts, qaUser: user, qaSession: session,
-        profile: { firstName:fn, lastName:ln, email } }, () => {
-        btn.disabled=false; showApp(user);
-        toast('Account created! Welcome to QuickApply 🎉', 'ok');
-      });
-    });
-  });
-
-  // Wire forgot button
-  sidebar.querySelector('#qa-forgot-btn').addEventListener('click', () => {
-    toast('Password reset instructions sent to your email!', 'ok');
-    qaShowLogin();
-  });
 
   function logout() {
     if (!confirm('Sign out of QuickApply?')) return;
-    chrome.storage.local.remove(['qaUser','qaSession'], () => showLogin());
+    chrome.storage.local.remove(['qaUser','qaSession'], showLogin);
   }
+
 
   // ════════════════════════════════════════════
   //  JOB DETECTION + AUTO-FETCH
@@ -770,6 +687,129 @@
       if (showFeedback) toast('Could not auto-fetch — paste the job description manually.', 'warn');
     }
     return jdText;
+  }
+
+  function renderActiveCVChip() {
+    getCVs(cvs => {
+      const cv = cvs.find(c=>c.isDefault)||cvs[0];
+      const nameEl = sidebar.querySelector('#qa-active-cv-name');
+      const subEl  = sidebar.querySelector('#qa-active-cv-sub');
+      if (nameEl) nameEl.textContent = cv ? cv.name : 'No CV selected';
+      if (subEl)  subEl.textContent  = cv ? (cv.jobTitle||'Click to switch') : 'Go to Settings → My CVs to add';
+    });
+  }
+
+  // ════════════════════════════════════════════
+  //  JOB HIGHLIGHTS (like LetMeApply card)
+  // ════════════════════════════════════════════
+  function populateHighlights() {
+    const jd = _cachedJD || fetchJobDescription(false) || '';
+    const titleEl = sidebar.querySelector('#qa-hl-title');
+    const metaEl  = sidebar.querySelector('#qa-hl-meta');
+    const skillsEl= sidebar.querySelector('#qa-hl-skills');
+    const qualsEl = sidebar.querySelector('#qa-hl-quals');
+    const qualsListEl = sidebar.querySelector('#qa-hl-quals-list');
+
+    // Job title
+    let title = '';
+    for (const sel of ['h1[class*="title"]','h1[class*="job"]','[class*="job-title"]:not(nav *)','h1']) {
+      try { const el=document.querySelector(sel); if(el&&!el.closest('#qa-sidebar')&&el.textContent.trim().length>3){title=el.textContent.trim().substring(0,80);break;} } catch(e){}
+    }
+    if (!title) title = document.title.replace(/\s[-|].*/,'').substring(0,80);
+    if (titleEl) titleEl.textContent = title || 'Job Details';
+
+    // Company + location
+    let company='', location='';
+    for(const sel of ['[class*="company-name"]','[class*="companyName"]','[class*="employer"]']){try{const el=document.querySelector(sel);if(el&&!el.closest('#qa-sidebar')){company=el.textContent.trim().substring(0,50);break;}}catch(e){}}
+    for(const sel of ['[class*="location"]:not(nav *):not(header *)','[class*="workplace"]']){try{const el=document.querySelector(sel);if(el&&!el.closest('#qa-sidebar')&&el.textContent.trim().length<60){location=el.textContent.trim().substring(0,50);break;}}catch(e){}}
+    const jobType = jd.match(/full.?time|part.?time|contract|remote|hybrid/i)?.[0] || '';
+    if (metaEl) {
+      metaEl.innerHTML = [company,location,jobType].filter(Boolean).map(s=>`<span class="qa-hl-tag">${s}</span>`).join('');
+    }
+
+    // Extract skills from JD
+    if (jd && skillsEl) {
+      const skillPatterns = ['JavaScript','TypeScript','Python','React','Node','Java','C\+\+','C#','SQL','AWS','Azure','Docker','Kubernetes','Git','REST','API','SAP','CAP','OData','Groovy','CSS','HTML','Vue','Angular','Go','Rust','Swift','Kotlin','Ruby','PHP','MongoDB','PostgreSQL','MySQL'];
+      const found = skillPatterns.filter(s => new RegExp('\b'+s+'\b','i').test(jd)).slice(0,8);
+      if (found.length) {
+        skillsEl.innerHTML = '<div class="qa-kw-label" style="margin:8px 0 5px">Skills Mentioned</div>' +
+          found.map(s=>`<span class="qa-hl-skill-tag">${s}</span>`).join('');
+      }
+    }
+
+    // Extract key requirements (bullet points)
+    if (jd && qualsEl && qualsListEl) {
+      const lines = jd.split('\n').map(l=>l.trim()).filter(l=>l.length>20&&l.length<150&&/you|experience|knowledge|degree|background|proficiency/i.test(l)).slice(0,4);
+      if (lines.length) {
+        qualsListEl.innerHTML = lines.map(l=>`• ${l.replace(/^[-•*]\s*/,'')}`).join('<br>');
+        qualsEl.style.display = 'block';
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════
+  //  TAILOR CV (main action - like LetMeApply)
+  // ════════════════════════════════════════════
+  function tailorCV() {
+    const jd = _cachedJD || fetchJobDescription(false);
+    if (!jd) { toast('Click "↻ Reload Job Details" first to fetch the job description!','warn'); return; }
+    chrome.storage.local.get('profile', async ({ profile }) => {
+      if (!profile?.firstName) { toast('Save your profile in Settings first!','warn'); return; }
+      getApiKey(async apiKey => {
+        if (!apiKey) { toast('Add your Anthropic API key in Settings!','warn'); return; }
+        useCredit(async ok => {
+          if (!ok) { qaOpenPricing(); return; }
+          const tailorBtn  = sidebar.querySelector('#qa-tailor-btn');
+          const bottomBtn  = sidebar.querySelector('#qa-bottom-tailor');
+          const tailorOut  = sidebar.querySelector('#qa-tailor-out');
+          const diffBox    = sidebar.querySelector('#qa-tailor-diff');
+          if(tailorBtn)  { tailorBtn.disabled=true;  tailorBtn.innerHTML='<span>⏳</span><span>Tailoring...</span>'; }
+          if(bottomBtn)  { bottomBtn.disabled=true;  bottomBtn.textContent='Tailoring...'; }
+          getActiveCV(async cv => {
+            const cvText = cv?.text || profile.summary || '';
+            if (!cvText) { toast('Add your CV text in Settings → My CVs first!','warn'); if(tailorBtn){tailorBtn.disabled=false;tailorBtn.innerHTML='<span>✨</span><span>Tailor Resume</span><span class="qa-btn-hint">< 30 sec</span>';} if(bottomBtn){bottomBtn.disabled=false;bottomBtn.textContent='✨ Tailor Resume';} return; }
+            try {
+              const result = await callClaude(apiKey,
+                `You are an expert resume writer. Tailor this resume for maximum ATS match with the job description.
+Instructions:
+- Keep all real experience - never fabricate
+- Mark every added/changed phrase: [ADDED: text]
+- Integrate missing keywords naturally
+- Keep same structure: SUMMARY | EXPERIENCE | SKILLS | EDUCATION
+
+RESUME:
+${cvText}
+
+JOB DESCRIPTION:
+${jd.substring(0,2000)}`, 1800);
+              tailorOut.style.display = 'block';
+              const clean = result.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\[ADDED: ([^\]]+)\]/g,'<span class="qa-diff-add">$1</span>');
+              const tailorOutEl = sidebar.querySelector('#qa-tailor-out');
+              if(tailorOutEl){ tailorOutEl.innerHTML=clean; tailorOutEl.style.display='block'; }
+              const tailorActEl = sidebar.querySelector('#qa-tailor-actions');
+              if(tailorActEl) tailorActEl.style.display='flex';
+              // Update stats
+              chrome.storage.local.get('qaTailorCount', ({qaTailorCount}) => {
+                const count = (qaTailorCount||0)+1;
+                chrome.storage.local.set({qaTailorCount:count}, updateStats);
+              });
+              toast('CV tailored! Green highlights show additions.','ok');
+            } catch(e) { toast('Tailoring failed: '+e.message,'err'); }
+            if(tailorBtn) { tailorBtn.disabled=false; tailorBtn.innerHTML='<span>✨</span><span>Tailor Resume</span><span class="qa-btn-hint">< 30 sec</span>'; }
+            if(bottomBtn) { bottomBtn.disabled=false; bottomBtn.textContent='✨ Tailor Resume'; }
+          });
+        });
+      });
+    });
+  }
+
+  function updateStats() {
+    chrome.storage.local.get(['applications','qaTailorCount'],({applications,qaTailorCount})=>{
+      const appliedEl  = sidebar.querySelector('#qa-stat-applied');
+      const tailoredEl = sidebar.querySelector('#qa-stat-tailored');
+      if(appliedEl)  appliedEl.textContent  = (applications?.length||0)+' applied';
+      if(tailoredEl) tailoredEl.textContent = (qaTailorCount||0)+' tailored';
+    });
   }
 
   // ════════════════════════════════════════════
@@ -1169,6 +1209,22 @@
     });
   }
 
+  function insertTextIntoForm(text) {
+    if (!text) return;
+    const tas = Array.from(document.querySelectorAll('textarea')).filter(t=>!t.closest('#qa-sidebar'));
+    const target = tas.find(t=>/cover|letter|message|motivation|why/i.test(getHint(t)))||tas[tas.length-1];
+    if (target) { setVal(target,text); toast('Inserted! ✓','ok'); } else toast('No text area found.','warn');
+  }
+
+  function saveTailoredAsCV(text) {
+    if (!text) return;
+    getCVs(cvs => {
+      const base = cvs.find(c=>c.isDefault)||cvs[0];
+      cvs.push({ id:'cv_'+Date.now(), name:(base?.name||'My CV')+' (Tailored '+new Date().toLocaleDateString()+')', jobTitle:base?.jobTitle||'', text, skills:base?.skills||'', education:base?.education||'', createdAt:Date.now() });
+      chrome.storage.local.set({ qaCVs:cvs }, () => { renderCVProfiles(); renderCVSelector(); renderActiveCVChip(); updateCVAnalyzeDropdown(); toast('Saved as new CV profile! ✓','ok'); });
+    });
+  }
+
   // ════════════════════════════════════════════
   //  CLAUDE API
   // ════════════════════════════════════════════
@@ -1200,10 +1256,10 @@
         useCredit(async ok=>{
           if (!ok) { qaOpenPricing(); return; }
           const btn=sidebar.querySelector('#qa-quick-cl-btn');
-          const out=sidebar.querySelector('#qa-quick-cl-out');
+          const out=sidebar.querySelector('#qa-cl-apply-out');
           btn.disabled=true; btn.textContent='Generating...';
-          out.innerHTML='<span class="qa-thinking">Writing your cover letter</span>';
-          out.classList.add('show');
+          const outEl = sidebar.querySelector('#qa-cl-apply-out');
+          if(outEl){ outEl.innerHTML='<span class="qa-thinking">Writing your cover letter</span>'; outEl.style.display='block'; }
           const jd=_cachedJD||fetchJobDescription(false)||'Job at '+PLATFORM;
           getActiveCV(async cv=>{
             try {
@@ -1307,8 +1363,8 @@
           if (!ok) { qaOpenPricing(); return; }
           const btn=sidebar.querySelector('#qa-cl-btn'),out=sidebar.querySelector('#qa-cl-out');
           btn.disabled=true; btn.textContent='Generating...';
-          out.innerHTML='<span class="qa-thinking">Writing your cover letter</span>';
-          out.classList.add('show');
+          const outEl = sidebar.querySelector('#qa-cl-apply-out');
+          if(outEl){ outEl.innerHTML='<span class="qa-thinking">Writing your cover letter</span>'; outEl.style.display='block'; }
           sidebar.querySelector('#qa-cl-actions').style.display='none';
           getActiveCV(async cv=>{
             try {
@@ -1408,8 +1464,10 @@
   const PRICES={monthly:{starter:'$7.99',pro:'$14.99',ultra:'$29.99'},annual:{starter:'$4.99',pro:'$8.99',ultra:'$17.99'}};
   const PLAN_NAMES={starter:'Starter',pro:'Pro',ultra:'Ultra'};
 
-  window.qaOpenPricing  = () => { sidebar.querySelector('#qa-pricing').classList.add('show'); loadSavedPayment(); };
-  window.qaClosePricing = () => { sidebar.querySelector('#qa-pricing').classList.remove('show'); sidebar.querySelector('#qa-pay-section').classList.remove('show'); selectedPlan=null; };
+  function openPricing()  { sidebar.querySelector('#qa-pricing').classList.add('show'); loadSavedPayment(); }
+  window.qaOpenPricing = openPricing;
+  function closePricing() { sidebar.querySelector('#qa-pricing').classList.remove('show'); sidebar.querySelector('#qa-pay-section').classList.remove('show'); selectedPlan=null; }
+  window.qaClosePricing = closePricing;
 
   function toggleBilling() { setBilling(billing==='monthly'?'annual':'monthly'); }
   function setBilling(mode) {

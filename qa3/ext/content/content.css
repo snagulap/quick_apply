@@ -261,3 +261,160 @@
 .qa-secure-note svg { width:11px; height:11px; fill:#16a34a; flex-shrink:0; }
 .qa-stripe-footer { text-align:center; font-size:10px; color:#9ca3af; margin-top:8px; }
 .qa-stripe-footer a { color:#16a34a; text-decoration:none; font-weight:600; }
+
+/* ── JOB HIGHLIGHTS BOX (LetMeApply style) ── */
+.qa-highlights-box {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 13px 14px;
+  margin-bottom: 12px;
+}
+.qa-highlights-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 5px;
+  line-height: 1.3;
+}
+.qa-highlights-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+.qa-hl-tag {
+  font-size: 10px;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.qa-hl-skills { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.qa-hl-skill-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+}
+
+/* ── ACTIVE CV CHIP ── */
+.qa-active-cv-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  background: #f0fdf4;
+  border: 1.5px solid #16a34a;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ── PRIMARY ACTION BUTTONS (LetMeApply style) ── */
+.qa-primary-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+.qa-primary-actions .qa-btn { flex: 1; }
+.qa-btn-lg {
+  padding: 12px 16px !important;
+  font-size: 13px !important;
+  flex-direction: column;
+  gap: 2px !important;
+  min-height: 52px;
+}
+.qa-btn-hint {
+  font-size: 9px;
+  font-weight: 500;
+  opacity: 0.8;
+  letter-spacing: 0.2px;
+}
+
+/* ── BOTTOM BAR (LetMeApply style) ── */
+.qa-bottom-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 10px 16px;
+  border-top: 1px solid #e5e7eb;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.qa-bottom-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+.qa-bottom-stats span { display: flex; align-items: center; gap: 4px; }
+
+/* ── SCREEN WRAPPER ── */
+.qa-screen { display:flex; flex-direction:column; height:100%; width:100%; }
+
+/* ── AUTH SCREEN ── */
+.qa-auth-hdr { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid #e5e7eb; flex-shrink:0; }
+.qa-auth-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; overflow-y:auto; }
+.qa-auth-icon { width:54px; height:54px; background:#16a34a; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; color:#fff; font-weight:900; margin-bottom:16px; flex-shrink:0; }
+.qa-auth-title { font-size:20px; font-weight:800; color:#111827; margin-bottom:6px; text-align:center; }
+.qa-auth-sub { font-size:12px; color:#6b7280; text-align:center; margin-bottom:22px; line-height:1.55; }
+.qa-auth-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.qa-check-lbl { display:flex; align-items:center; gap:6px; font-size:11px; color:#374151; cursor:pointer; }
+.qa-check-lbl input { width:auto; accent-color:#16a34a; }
+.qa-auth-switch { text-align:center; margin-top:14px; font-size:11px; color:#6b7280; }
+.qa-link { color:#16a34a; cursor:pointer; font-weight:600; text-decoration:none; }
+.qa-link-bold { font-weight:700; }
+
+/* ── JOB HIGHLIGHTS ── */
+.qa-highlights-box { background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:13px 14px; margin-bottom:10px; }
+.qa-highlights-title { font-size:14px; font-weight:800; color:#111827; line-height:1.35; margin-bottom:5px; }
+.qa-highlights-meta { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:4px; }
+.qa-hl-tag { font-size:10px; color:#6b7280; background:#f3f4f6; padding:2px 8px; border-radius:20px; font-weight:500; }
+.qa-hl-section { margin-top:8px; }
+.qa-hl-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#9ca3af; margin-bottom:5px; }
+.qa-hl-skill-tag { font-size:10px; font-weight:600; padding:3px 9px; border-radius:20px; background:#f0fdf4; border:1px solid #bbf7d0; color:#15803d; }
+.qa-expand-btn { font-size:10px; color:#16a34a; font-weight:700; background:none; border:1px solid #bbf7d0; padding:2px 10px; border-radius:20px; cursor:pointer; margin-top:5px; }
+
+/* ── ACTIVE CV ROW ── */
+.qa-cv-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.qa-cv-row-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#9ca3af; white-space:nowrap; }
+.qa-active-cv-chip { flex:1; display:flex; align-items:center; gap:7px; padding:6px 10px; background:#f0fdf4; border:1.5px solid #16a34a; border-radius:8px; min-width:0; cursor:pointer; }
+.qa-active-cv-text { font-size:11px; font-weight:700; color:#15803d; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* ── PRIMARY ACTION ROW ── */
+.qa-primary-row { display:flex; gap:8px; margin-bottom:8px; }
+.qa-primary-row .qa-btn { flex:1; padding:12px 10px; font-size:12px; flex-direction:column; gap:3px; min-height:54px; }
+.qa-btn-hint { font-size:9px; font-weight:500; opacity:0.75; }
+
+/* ── BOTTOM BAR ── */
+.qa-bottom-bar { position:absolute; bottom:0; left:0; right:0; border-top:1px solid #e5e7eb; background:#fff; padding:8px 14px 10px; display:flex; flex-direction:column; gap:6px; flex-shrink:0; }
+.qa-bottom-stats { display:flex; justify-content:space-between; font-size:10px; color:#9ca3af; }
+.qa-bottom-stats strong { color:#374151; }
+.qa-bottom-actions { display:flex; gap:8px; }
+
+/* ── CV PROFILE CARDS ── */
+.qa-cv-profile-card { display:flex; align-items:center; gap:10px; padding:9px 11px; background:#fff; border:1px solid #e5e7eb; border-radius:8px; margin-bottom:5px; }
+.qa-cv-profile-card:hover { border-color:#16a34a; }
+.qa-cvp-info { flex:1; min-width:0; }
+.qa-cvp-name { font-size:12px; font-weight:700; color:#111827; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.qa-cvp-meta { font-size:10px; color:#9ca3af; margin-top:2px; }
+.qa-cvp-actions { display:flex; align-items:center; gap:5px; flex-shrink:0; }
+.qa-cvp-btn { font-size:10px; font-weight:600; padding:3px 8px; border-radius:6px; border:1px solid #e5e7eb; background:#fff; color:#374151; cursor:pointer; white-space:nowrap; }
+.qa-cvp-btn:hover { border-color:#16a34a; color:#16a34a; }
+.qa-cvp-del:hover { border-color:#ef4444; color:#ef4444; background:#fff1f2; }
+.qa-cvp-default { font-size:9px; font-weight:700; padding:3px 7px; border-radius:20px; background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; }
+
+/* ── CV INPUT TABS ── */
+.qa-cv-input-tab { padding:5px 12px; border-radius:7px; border:1px solid #e5e7eb; background:#fff; color:#6b7280; font-size:11px; font-weight:600; cursor:pointer; transition:all 0.15s; }
+.qa-cv-input-tab.active { background:#16a34a; color:#fff; border-color:#16a34a; }
+
+/* ── UPLOAD ZONE ── */
+.qa-upload-zone { border:2px dashed #e5e7eb; border-radius:10px; padding:24px 16px; text-align:center; cursor:pointer; background:#fafafa; }
+.qa-upload-zone:hover { border-color:#16a34a; background:#f0fdf4; }
