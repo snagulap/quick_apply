@@ -6,8 +6,8 @@
 
 // ── CONFIG ───────────────────────────────────────────────────
 // Update SERVER_URL after deploying your backend
-const SERVER_URL    = 'https://your-server.onrender.com'; // ← change this
-const STRIPE_PK     = 'pk_live_YOUR_STRIPE_PUBLISHABLE_KEY'; // ← change this
+const SERVER_URL    = 'https://quick-apply-ysbb.onrender.com'; // ← change this
+const STRIPE_PK     = 'pk_test_51T7At0ICZKAj7VsM8EKGu2uSieCYeWjHsTLzfz0wkGRAcJlBu4ZpniP3t5kBXLNoVGaYihqaQdx0brwY2tPRj8R000R4vJjhxx'; // ← change this
 
 // ── Stripe handled via server (MV3 blocks external scripts) ─────────────
 // Card details collected manually and sent to backend which uses Stripe API
