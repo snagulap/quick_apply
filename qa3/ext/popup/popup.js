@@ -9,38 +9,9 @@
 const SERVER_URL    = 'https://your-server.onrender.com'; // ← change this
 const STRIPE_PK     = 'pk_live_YOUR_STRIPE_PUBLISHABLE_KEY'; // ← change this
 
-// ── Stripe Init ──────────────────────────────────────────────
-let stripe      = null;
-let cardElement = null;
-let stripeReady = false;
-
-function initStripe() {
-  if (stripeReady) return;
-  try {
-    stripe      = Stripe(STRIPE_PK);
-    const els   = stripe.elements({ appearance: {
-      theme: 'night',
-      variables: {
-        colorPrimary:       '#5b5eff',
-        colorBackground:    '#1c1c2e',
-        colorText:          '#eeeeff',
-        colorDanger:        '#ff4f8b',
-        fontFamily:         'DM Sans, system-ui, sans-serif',
-        spacingUnit:        '4px',
-        borderRadius:       '7px',
-      }
-    }});
-    cardElement = els.create('card', { hidePostalCode: true });
-    cardElement.mount('#stripe-card-element');
-    cardElement.on('change', ({ error }) => {
-      const errEl = document.getElementById('card-errors');
-      errEl.textContent = error ? '⚠ ' + error.message : '';
-    });
-    stripeReady = true;
-  } catch(e) {
-    console.warn('Stripe init error:', e.message);
-  }
-}
+// ── Stripe handled via server (MV3 blocks external scripts) ─────────────
+// Card details collected manually and sent to backend which uses Stripe API
+function initStripe() { /* no-op in MV3 */ }
 
 // ── Tab Navigation ────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach(tab => {
@@ -512,101 +483,79 @@ function selectPlan(name) {
   setTimeout(() => pf.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
 }
 
-// ── REAL STRIPE PAYMENT ───────────────────────────────────────
+// ── REAL STRIPE PAYMENT (MV3 compatible — card fields sent to server) ───────
 async function processPayment() {
   if (!selectedPlan) { showPayMsg('Please select a plan above.', false); return; }
-  if (!stripeReady || !stripe || !cardElement) {
-    showPayMsg('Payment form not loaded yet. Please wait a moment.', false); return;
-  }
 
-  const name  = document.getElementById('payName').value.trim();
-  const email = document.getElementById('payEmail').value.trim();
+  const name    = document.getElementById('payName').value.trim();
+  const email   = document.getElementById('payEmail').value.trim();
+  const cardNum = document.getElementById('cardNumber').value.replace(/\s/g,'');
+  const expiry  = document.getElementById('cardExpiry').value.replace(/\s/g,'');
+  const cvc     = document.getElementById('cardCvc').value.trim();
 
   if (!name)  { showPayMsg('Please enter your full name.', false); return; }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showPayMsg('Please enter a valid email address.', false); return;
-  }
+    showPayMsg('Please enter a valid email address.', false); return; }
+  if (cardNum.length < 15) { showPayMsg('Please enter a valid card number.', false); return; }
+  if (!expiry || expiry.length < 4) { showPayMsg('Please enter card expiry date.', false); return; }
+  if (cvc.length < 3) { showPayMsg('Please enter your CVC.', false); return; }
 
   const btn = document.getElementById('payBtn');
   btn.disabled = true; btn.textContent = 'Processing...';
   document.getElementById('payMsg').classList.remove('show');
 
+  // Parse expiry MM/YY
+  const expParts = expiry.replace(/\s/g,'').split('/');
+  const expMonth = expParts[0];
+  const expYear  = expParts[1] ? (expParts[1].length === 2 ? '20'+expParts[1] : expParts[1]) : '';
+
   try {
-    // Step 1: Create Stripe PaymentMethod from card element
-    const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
-      type: 'card',
-      card: cardElement,
-      billing_details: { name, email },
-    });
-
-    if (pmError) {
-      showPayMsg('Card error: ' + pmError.message, false);
-      btn.disabled = false; btn.textContent = 'Subscribe Now';
-      return;
-    }
-
-    // Step 2: Send to your backend to create Stripe subscription
-    const subRes = await fetch(SERVER_URL + '/api/create-subscription', {
+    // Send card + plan to backend — server uses Stripe API to tokenize & charge
+    const res = await fetch(SERVER_URL + '/api/create-subscription', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        paymentMethodId: paymentMethod.id,
-        plan:            selectedPlan,
-        billing:         billingMode,
+        card: { number: cardNum, exp_month: expMonth, exp_year: expYear, cvc },
+        plan:    selectedPlan,
+        billing: billingMode,
         email,
         name,
-        extensionUserId: await getExtensionId(),
+        extensionUserId: chrome.runtime.id || 'unknown',
       }),
     });
 
-    const subData = await subRes.json();
+    const data = await res.json();
 
-    if (subData.error) {
-      showPayMsg('Payment failed: ' + subData.error, false);
+    if (data.error) {
+      showPayMsg('Payment failed: ' + data.error, false);
       btn.disabled = false; btn.textContent = 'Subscribe Now';
       return;
     }
 
-    // Step 3: Handle 3D Secure if required
-    if (subData.requiresAction && subData.clientSecret) {
-      const { error: confirmError } = await stripe.confirmCardPayment(subData.clientSecret);
-      if (confirmError) {
-        showPayMsg('Authentication failed: ' + confirmError.message, false);
-        btn.disabled = false; btn.textContent = 'Subscribe Now';
-        return;
-      }
-    }
-
-    // Step 4: Activate plan locally
+    // Activate plan locally
     const planCredits = { starter:50, pro:999999, ultra:999999 };
     chrome.storage.local.set({
-      plan: selectedPlan,
-      credits: planCredits[selectedPlan],
-      creditsDate: new Date().toDateString(),
-      subscriptionId: subData.subscriptionId || '',
-      customerId:     subData.customerId || '',
+      plan:           selectedPlan,
+      credits:        planCredits[selectedPlan],
+      creditsDate:    new Date().toDateString(),
+      subscriptionId: data.subscriptionId || '',
+      customerId:     data.customerId || '',
       userEmail:      email,
     }, () => {
       updateCreditUI();
-      showPayMsg('🎉 Welcome to ' + PLAN_LABEL[selectedPlan] + '! Your plan is now active.', true);
+      showPayMsg('Welcome to ' + PLAN_LABEL[selectedPlan] + '! Your plan is now active.', true);
       setTimeout(() => closePricing(), 3000);
     });
 
   } catch(e) {
-    const msg = e.message.includes('fetch') || e.message.includes('Failed to fetch')
-      ? 'Cannot reach the payment server. Make sure your server is running at: ' + SERVER_URL
+    const msg = e.message.includes('fetch') || e.message.includes('Failed')
+      ? 'Cannot reach payment server. Check SERVER_URL in popup.js: ' + SERVER_URL
       : 'Payment error: ' + e.message;
     showPayMsg(msg, false);
     btn.disabled = false; btn.textContent = 'Subscribe Now';
   }
 }
 
-async function getExtensionId() {
-  return new Promise(resolve => {
-    try { resolve(chrome.runtime.id || 'unknown'); }
-    catch(e) { resolve('unknown'); }
-  });
-}
 
 function showPayMsg(msg, ok) {
   const el = document.getElementById('payMsg');
@@ -624,6 +573,18 @@ function flash(id, ok) {
   if (!el) return;
   el.className = 'fmsg ' + (ok ? 'fmsg-ok' : 'fmsg-err') + ' show';
   setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+
+// ── Card Input Formatters ─────────────────────────────────────
+function fmtCard(el) {
+  let v = el.value.replace(/\D/g,'').substring(0,16);
+  el.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+function fmtExp(el) {
+  let v = el.value.replace(/\D/g,'').substring(0,4);
+  if (v.length >= 2) v = v.substring(0,2) + ' / ' + v.substring(2);
+  el.value = v;
 }
 
 // ── Init ──────────────────────────────────────────────────────

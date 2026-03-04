@@ -5,7 +5,6 @@
 <title>QuickApply</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <!-- Stripe.js loaded in popup context (not content script) -->
-<script src="https://js.stripe.com/v3/"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -525,13 +524,22 @@ body{width:430px;height:600px;background:var(--bg);color:var(--text);font-family
       <input id="payEmail" type="email" placeholder="jane@example.com" autocomplete="email"/>
     </div>
 
-    <!-- Stripe Elements card input -->
+    <!-- Manual card input fields -->
     <div class="stripe-field">
-      <label>Card Details</label>
-      <div id="stripe-card-element"></div>
+      <label>Card Number</label>
+      <input id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this)" autocomplete="cc-number"/>
     </div>
-
-    <div id="card-errors" role="alert"></div>
+    <div style="display:flex;gap:8px">
+      <div class="stripe-field" style="flex:1">
+        <label>Expiry</label>
+        <input id="cardExpiry" placeholder="MM / YY" maxlength="7" oninput="fmtExp(this)" autocomplete="cc-exp"/>
+      </div>
+      <div class="stripe-field" style="flex:1">
+        <label>CVC</label>
+        <input id="cardCvc" placeholder="123" maxlength="4" autocomplete="cc-csc"/>
+      </div>
+    </div>
+    <div id="card-errors" role="alert" style="font-size:11px;color:#ff4f8b;margin-bottom:8px;min-height:16px"></div>
 
     <div class="secure-note">
       <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
