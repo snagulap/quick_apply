@@ -1,4 +1,0 @@
-.env.example
-.env
-*.pem
-*.key
