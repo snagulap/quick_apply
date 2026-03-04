@@ -1,20 +1,46 @@
-// QuickApply v3 - Background: clicking icon toggles sidebar
-chrome.action.onClicked.addListener((tab) => {
-  chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    func: () => {
-      const sidebar = document.getElementById('qa-sidebar');
-      if (sidebar) {
-        sidebar.classList.toggle('qa-open');
-      }
-    }
-  });
-});
+// QuickApply — clicking icon injects + toggles sidebar on ANY page
+chrome.action.onClicked.addListener(async (tab) => {
+  if (!tab.id || !tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://')) return;
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status !== 'complete' || !tab.url) return;
-  const supported = ['linkedin.com','indeed.com','glassdoor.com','greenhouse.io','lever.co','workday.com'];
-  const on = supported.some(d => tab.url.includes(d));
-  chrome.action.setBadgeText({ text: on ? 'ON' : '', tabId });
-  chrome.action.setBadgeBackgroundColor({ color: '#16a34a', tabId });
+  try {
+    // First inject CSS
+    await chrome.scripting.insertCSS({
+      target: { tabId: tab.id },
+      files: ['content/content.css']
+    });
+  } catch(e) { /* already injected */ }
+
+  try {
+    // Then inject JS if sidebar doesn't exist yet, or just toggle
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: () => {
+        const existing = document.getElementById('qa-sidebar');
+        if (existing) {
+          existing.classList.toggle('qa-open');
+          return 'toggled';
+        }
+        return 'needs-inject';
+      }
+    }).then(async (results) => {
+      if (results?.[0]?.result === 'needs-inject') {
+        await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ['content/content.js']
+        });
+        // Open it after injection
+        setTimeout(() => {
+          chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: () => {
+              const s = document.getElementById('qa-sidebar');
+              if (s) s.classList.add('qa-open');
+            }
+          });
+        }, 300);
+      }
+    });
+  } catch(e) {
+    console.error('QuickApply inject error:', e);
+  }
 });
