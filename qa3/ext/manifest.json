@@ -39,9 +39,6 @@
     "css": ["content/content.css"],
     "run_at": "document_idle"
   }],
-  "content_security_policy": {
-    "extension_pages": "script-src 'self' https://js.stripe.com; object-src 'self'"
-  },
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
