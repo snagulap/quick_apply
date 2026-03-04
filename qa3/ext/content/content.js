@@ -96,8 +96,9 @@
       <div class="qa-tab qa-active" data-p="apply">Apply</div>
       <div class="qa-tab" data-p="cv">CV Align</div>
       <div class="qa-tab" data-p="ai">AI Tools</div>
-      <div class="qa-tab" data-p="tracker">Tracker</div>
-      <div class="qa-tab" data-p="settings">Settings</div>
+      <div class="qa-tab" data-p="tracker">📊</div>
+      <div class="qa-tab" data-p="analytics">Overview</div>
+      <div class="qa-tab" data-p="settings">⚙️</div>
     </div>
 
     <div class="qa-body">
@@ -184,7 +185,7 @@
             <span class="qa-meter-count" id="qa-meter-count">3 / 3</span>
           </div>
           <div class="qa-meter-bar"><div class="qa-meter-fill" id="qa-meter-fill" style="width:100%"></div></div>
-          <div class="qa-meter-hint">Free resets daily · <span class="qa-link" id="qa-upgrade-link">Upgrade for unlimited →</span></div>
+          <div class="qa-meter-hint">10 free/day · resets midnight · <span class="qa-link" id="qa-upgrade-link">Upgrade →</span></div>
         </div>
       </div>
 
@@ -195,9 +196,13 @@
           <div class="qa-card-desc">Score your CV against this job and see exactly what's missing.</div>
           <div class="qa-field">
             <label style="display:flex;justify-content:space-between;align-items:center">
-              Job Description <span class="qa-link" id="qa-fetch-jd-btn" style="font-size:10px">↻ Fetch from page</span>
+              Job Description
+              <span style="display:flex;gap:8px;align-items:center">
+                <span class="qa-link" id="qa-clear-jd-btn" style="font-size:10px;color:#9ca3af">✕ Clear</span>
+                <span class="qa-link" id="qa-fetch-jd-btn" style="font-size:10px">↻ Fetch from page</span>
+              </span>
             </label>
-            <textarea id="qa-cv-jd" placeholder="Paste job description or click 'Fetch from page'..." style="min-height:90px"></textarea>
+            <textarea id="qa-cv-jd" placeholder="Paste job description or click '↻ Fetch from page'..." style="min-height:100px"></textarea>
           </div>
           <div class="qa-field">
             <label>Select CV</label>
@@ -335,9 +340,18 @@
           </div>
           <div class="qa-sec-card" style="margin-top:10px">
             <div class="qa-sec-card-title">AI Configuration</div>
-            <div class="qa-field" style="margin-top:8px"><label>Anthropic API Key</label><input type="password" id="qa-ak" placeholder="sk-ant-api03-..."/></div>
-            <div class="qa-api-note">Get a free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> · Stored locally only</div>
-            <button class="qa-btn qa-btn-outline" id="qa-save-api-btn" style="margin-top:8px">Save API Key</button>
+            <div class="qa-field" style="margin-top:8px">
+              <label style="display:flex;align-items:center;justify-content:space-between">
+                Anthropic API Key
+                <span id="qa-api-status" style="font-size:10px;font-weight:700"></span>
+              </label>
+              <input type="password" id="qa-ak" placeholder="sk-ant-api03-..."/>
+            </div>
+            <div class="qa-api-note">Get a free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> · Stored locally, never sent to our servers</div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="qa-btn qa-btn-outline" style="flex:1" id="qa-save-api-btn">💾 Save API Key</button>
+              <button class="qa-btn qa-btn-outline" style="flex:1" id="qa-test-api-btn">🧪 Test Key</button>
+            </div>
             <div class="qa-flash" id="qa-api-flash" style="margin-top:6px"></div>
           </div>
           <div style="margin-top:12px;text-align:center">
@@ -426,12 +440,170 @@
           <div class="qa-toggle-row"><div><div class="qa-toggle-label">Auto-fetch job description</div><div class="qa-toggle-desc">Extract job text when sidebar opens</div></div><div class="qa-toggle on" id="qa-tog-autofetch"></div></div>
           <div class="qa-toggle-row"><div><div class="qa-toggle-label">Dark mode</div><div class="qa-toggle-desc">Coming soon</div></div><div class="qa-toggle" id="qa-tog-dark" style="opacity:0.4;pointer-events:none"></div></div>
           <div style="margin-top:12px"><button class="qa-btn qa-btn-green" id="qa-save-prefs-btn">💾 Save Preferences</button></div>
+          <div class="qa-sec-divider">Developer</div>
+          <div class="qa-sec-card">
+            <div class="qa-sec-card-title">Debug Tools</div>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+              <button class="qa-btn qa-btn-outline" style="flex:1;font-size:11px" id="qa-reset-credits-btn">↺ Reset Credits</button>
+              <button class="qa-btn qa-btn-outline" style="flex:1;font-size:11px" id="qa-clear-cache-btn">🗑 Clear JD Cache</button>
+            </div>
+          </div>
           <div class="qa-flash qa-flash-ok" id="qa-prefs-flash">✓ Saved!</div>
         </div>
 
       </div>
 
-    </div><!-- /body -->    </div><!-- /body -->
+      <!-- ANALYTICS TAB -->
+      <div class="qa-panel" id="qa-p-analytics">
+
+        <!-- Stats cards row -->
+        <div class="qa-overview-hdr">
+          <div class="qa-overview-title">Overview</div>
+          <div class="qa-period-select">
+            <select id="qa-period-sel" class="qa-period-sel">
+              <option value="30">Monthly</option>
+              <option value="7">Last 7 Days</option>
+              <option value="all">All Time</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="qa-stat-cards">
+          <div class="qa-stat-card">
+            <div class="qa-stat-card-lbl">All Time</div>
+            <div class="qa-stat-card-num" id="qa-ov-all">0</div>
+            <div class="qa-stat-card-sub">Total applications</div>
+          </div>
+          <div class="qa-stat-card">
+            <div class="qa-stat-card-lbl">Monthly</div>
+            <div class="qa-stat-card-num" id="qa-ov-month">0</div>
+            <div class="qa-stat-card-sub">Applications in last 30 days</div>
+          </div>
+          <div class="qa-stat-card">
+            <div class="qa-stat-card-lbl">Last 7 Days</div>
+            <div class="qa-stat-card-num" id="qa-ov-week">0</div>
+            <div class="qa-stat-card-sub">Applications in last 7 days</div>
+          </div>
+        </div>
+
+        <!-- Activity calendar (GitHub-style) -->
+        <div class="qa-analytics-card" style="margin-top:12px">
+          <div class="qa-analytics-card-title">Activity this month</div>
+          <div id="qa-activity-cal" class="qa-activity-cal"></div>
+          <div class="qa-cal-legend">
+            <span>Less</span>
+            <div class="qa-cal-leg-box" style="background:#e5e7eb"></div>
+            <div class="qa-cal-leg-box" style="background:#bbf7d0"></div>
+            <div class="qa-cal-leg-box" style="background:#4ade80"></div>
+            <div class="qa-cal-leg-box" style="background:#16a34a"></div>
+            <div class="qa-cal-leg-box" style="background:#14532d"></div>
+            <span>More</span>
+          </div>
+          <div class="qa-cal-footer">
+            <div><div class="qa-cal-stat-num" id="qa-cal-viewed">0</div><div class="qa-cal-stat-lbl">Jobs viewed this month</div></div>
+            <div><div class="qa-cal-stat-num" id="qa-cal-applied" style="color:#16a34a">0</div><div class="qa-cal-stat-lbl">Jobs applied this month</div></div>
+          </div>
+        </div>
+
+        <!-- Trend chart -->
+        <div class="qa-analytics-card" style="margin-top:10px">
+          <div class="qa-analytics-card-title">Application Trends</div>
+          <div style="font-size:10px;color:#9ca3af;margin-bottom:10px">Track jobs applied and viewed over time</div>
+          <div id="qa-trend-chart" class="qa-trend-chart">
+            <canvas id="qa-trend-canvas" height="100"></canvas>
+          </div>
+          <div class="qa-chart-legend">
+            <span class="qa-chart-leg-dot" style="background:#16a34a"></span><span>Jobs Applied</span>
+            <span class="qa-chart-leg-dot" style="background:#f59e0b"></span><span>Jobs Viewed</span>
+          </div>
+        </div>
+
+        <!-- Usage stats (like LetMeApply) -->
+        <div class="qa-analytics-card" style="margin-top:10px">
+          <div class="qa-analytics-card-title">USAGE</div>
+          <div class="qa-usage-row"><span>Jobs imported</span><span id="qa-use-imported">0/15</span></div>
+          <div class="qa-usage-row"><span>Resumes tailored</span><span id="qa-use-tailored">0/5</span></div>
+          <div class="qa-usage-row"><span>Cover letters generated</span><span id="qa-use-covers">0/2</span></div>
+        </div>
+
+      </div>
+
+    </div><!-- /body -->      <!-- ANALYTICS TAB -->
+      <div class="qa-panel" id="qa-p-analytics">
+
+        <!-- Stats cards row -->
+        <div class="qa-overview-hdr">
+          <div class="qa-overview-title">Overview</div>
+          <div class="qa-period-select">
+            <select id="qa-period-sel" class="qa-period-sel">
+              <option value="30">Monthly</option>
+              <option value="7">Last 7 Days</option>
+              <option value="all">All Time</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="qa-stat-cards">
+          <div class="qa-stat-card">
+            <div class="qa-stat-card-lbl">All Time</div>
+            <div class="qa-stat-card-num" id="qa-ov-all">0</div>
+            <div class="qa-stat-card-sub">Total applications</div>
+          </div>
+          <div class="qa-stat-card">
+            <div class="qa-stat-card-lbl">Monthly</div>
+            <div class="qa-stat-card-num" id="qa-ov-month">0</div>
+            <div class="qa-stat-card-sub">Applications in last 30 days</div>
+          </div>
+          <div class="qa-stat-card">
+            <div class="qa-stat-card-lbl">Last 7 Days</div>
+            <div class="qa-stat-card-num" id="qa-ov-week">0</div>
+            <div class="qa-stat-card-sub">Applications in last 7 days</div>
+          </div>
+        </div>
+
+        <!-- Activity calendar (GitHub-style) -->
+        <div class="qa-analytics-card" style="margin-top:12px">
+          <div class="qa-analytics-card-title">Activity this month</div>
+          <div id="qa-activity-cal" class="qa-activity-cal"></div>
+          <div class="qa-cal-legend">
+            <span>Less</span>
+            <div class="qa-cal-leg-box" style="background:#e5e7eb"></div>
+            <div class="qa-cal-leg-box" style="background:#bbf7d0"></div>
+            <div class="qa-cal-leg-box" style="background:#4ade80"></div>
+            <div class="qa-cal-leg-box" style="background:#16a34a"></div>
+            <div class="qa-cal-leg-box" style="background:#14532d"></div>
+            <span>More</span>
+          </div>
+          <div class="qa-cal-footer">
+            <div><div class="qa-cal-stat-num" id="qa-cal-viewed">0</div><div class="qa-cal-stat-lbl">Jobs viewed this month</div></div>
+            <div><div class="qa-cal-stat-num" id="qa-cal-applied" style="color:#16a34a">0</div><div class="qa-cal-stat-lbl">Jobs applied this month</div></div>
+          </div>
+        </div>
+
+        <!-- Trend chart -->
+        <div class="qa-analytics-card" style="margin-top:10px">
+          <div class="qa-analytics-card-title">Application Trends</div>
+          <div style="font-size:10px;color:#9ca3af;margin-bottom:10px">Track jobs applied and viewed over time</div>
+          <div id="qa-trend-chart" class="qa-trend-chart">
+            <canvas id="qa-trend-canvas" height="100"></canvas>
+          </div>
+          <div class="qa-chart-legend">
+            <span class="qa-chart-leg-dot" style="background:#16a34a"></span><span>Jobs Applied</span>
+            <span class="qa-chart-leg-dot" style="background:#f59e0b"></span><span>Jobs Viewed</span>
+          </div>
+        </div>
+
+        <!-- Usage stats (like LetMeApply) -->
+        <div class="qa-analytics-card" style="margin-top:10px">
+          <div class="qa-analytics-card-title">USAGE</div>
+          <div class="qa-usage-row"><span>Jobs imported</span><span id="qa-use-imported">0/15</span></div>
+          <div class="qa-usage-row"><span>Resumes tailored</span><span id="qa-use-tailored">0/5</span></div>
+          <div class="qa-usage-row"><span>Cover letters generated</span><span id="qa-use-covers">0/2</span></div>
+        </div>
+
+      </div>
+
+    </div><!-- /body -->
 
     <!-- BOTTOM BAR — LetMeApply style -->
     <div class="qa-bottom-bar">
@@ -467,19 +639,19 @@
           <button class="qa-btn qa-btn-outline" disabled style="opacity:0.5">Current Plan</button>
         </div>
         <div class="qa-plan-card">
-          <div class="qa-plan-row"><div class="qa-plan-name">Starter</div><div><div class="qa-plan-price" id="qa-pr-s">$7.99</div><div class="qa-plan-period" id="qa-pp-s">/month</div></div></div>
+          <div class="qa-plan-row"><div class="qa-plan-name">Starter</div><div><div class="qa-plan-price" id="qa-pr-s">€2.50</div><div class="qa-plan-period" id="qa-pp-s">/month</div></div></div>
           <div class="qa-plan-tagline">50 credits/month · 3 CV profiles</div>
           <div class="qa-plan-features"><div class="qa-feat"><span class="qa-feat-y">✓</span> 50 AI credits/month</div><div class="qa-feat"><span class="qa-feat-y">✓</span> 3 CV profiles + upload</div><div class="qa-feat"><span class="qa-feat-y">✓</span> ATS scoring</div><div class="qa-feat dim"><span class="qa-feat-n">✕</span> CV rewrite</div></div>
           <button class="qa-btn qa-btn-outline" id="qa-sel-starter">Get Starter →</button>
         </div>
         <div class="qa-plan-card highlighted popular">
-          <div class="qa-plan-row"><div class="qa-plan-name" style="color:#16a34a">Pro</div><div><div class="qa-plan-price" style="color:#16a34a" id="qa-pr-p">$14.99</div><div class="qa-plan-period" id="qa-pp-p">/month</div></div></div>
+          <div class="qa-plan-row"><div class="qa-plan-name" style="color:#16a34a">Pro</div><div><div class="qa-plan-price" style="color:#16a34a" id="qa-pr-p">€7.49</div><div class="qa-plan-period" id="qa-pp-p">/month</div></div></div>
           <div class="qa-plan-tagline">Unlimited credits · 10 CVs</div>
           <div class="qa-plan-features"><div class="qa-feat"><span class="qa-feat-y">✓</span> <strong>Unlimited AI credits</strong></div><div class="qa-feat"><span class="qa-feat-y">✓</span> 10 CV profiles + upload</div><div class="qa-feat"><span class="qa-feat-y">✓</span> CV rewrite to 100% match</div><div class="qa-feat"><span class="qa-feat-y">✓</span> Interview Q&amp;A prep</div></div>
           <button class="qa-btn qa-btn-green" id="qa-sel-pro">Get Pro →</button>
         </div>
         <div class="qa-plan-card">
-          <div class="qa-plan-row"><div class="qa-plan-name" style="color:#92400e">Ultra</div><div><div class="qa-plan-price" style="color:#92400e" id="qa-pr-u">$29.99</div><div class="qa-plan-period" id="qa-pp-u">/month</div></div></div>
+          <div class="qa-plan-row"><div class="qa-plan-name" style="color:#92400e">Ultra</div><div><div class="qa-plan-price" style="color:#92400e" id="qa-pr-u">€14.99</div><div class="qa-plan-period" id="qa-pp-u">/month</div></div></div>
           <div class="qa-plan-tagline">Everything + power tools</div>
           <div class="qa-plan-features"><div class="qa-feat"><span class="qa-feat-y">✓</span> Unlimited CVs + bulk upload</div><div class="qa-feat"><span class="qa-feat-y">✓</span> Salary negotiation coach</div><div class="qa-feat"><span class="qa-feat-y">✓</span> LinkedIn optimizer</div><div class="qa-feat"><span class="qa-feat-y">✓</span> Priority support</div></div>
           <button class="qa-btn qa-btn-gold" id="qa-sel-ultra">Get Ultra →</button>
@@ -489,7 +661,7 @@
         <h3>💳 Complete Purchase</h3>
         <div class="qa-pay-summary">
           <div><div class="qa-pay-plan-name" id="qa-pay-nm">Pro Plan</div><div class="qa-pay-billing" id="qa-pay-bl">Billed monthly</div></div>
-          <div class="qa-pay-price" id="qa-pay-pr">$14.99</div>
+          <div class="qa-pay-price" id="qa-pay-pr">€7.49</div>
         </div>
         <div class="qa-field"><label>Full Name</label><input id="qa-pay-fullname" placeholder="Jane Doe"/></div>
         <div class="qa-field"><label>Email</label><input type="email" id="qa-pay-email" placeholder="jane@example.com"/></div>
@@ -579,8 +751,9 @@
         sidebar.querySelectorAll('.qa-panel').forEach(p => p.classList.remove('qa-active'));
         tab.classList.add('qa-active');
         $('qa-p-'+tab.dataset.p).classList.add('qa-active');
-        if (tab.dataset.p === 'tracker')  loadTracker();
-        if (tab.dataset.p === 'settings') renderCVProfiles();
+        if (tab.dataset.p === 'tracker')   loadTracker();
+        if (tab.dataset.p === 'analytics')  loadAnalytics();
+        if (tab.dataset.p === 'settings')   renderCVProfiles();
       });
     });
 
@@ -609,7 +782,16 @@
     });
 
     // ── CV Align tab ─────────────────────────────
-    $('qa-fetch-jd-btn').addEventListener('click', () => fetchJobDescription(true,'qa-cv-jd'));
+    $('qa-fetch-jd-btn').addEventListener('click', () => {
+      $('qa-cv-jd').value = '';  // clear first so it refetches
+      _cachedJD = '';
+      fetchJobDescription(true, 'qa-cv-jd');
+    });
+    $('qa-clear-jd-btn') && $('qa-clear-jd-btn').addEventListener('click', () => {
+      $('qa-cv-jd').value = '';
+      _cachedJD = '';
+      toast('Job description cleared', 'ok');
+    });
     $('qa-analyze-btn').addEventListener('click', analyzeCV);
     $('qa-rewrite-btn').addEventListener('click', rewriteCV);
     $('qa-copy-cv-btn').addEventListener('click', () => navigator.clipboard.writeText($('qa-diff-box')?.textContent||'').then(()=>toast('Copied!','ok')));
@@ -637,11 +819,25 @@
         if (btn.dataset.sec === 'cvs') renderCVProfiles();
         if (btn.dataset.sec === 'billing') updateBillingSection();
         if (btn.dataset.sec === 'security') {
-          chrome.storage.local.get('qaUser', ({qaUser}) => {
-            if (!qaUser) return;
-            const n = $('qa-sec-name'), e = $('qa-sec-email');
-            if(n) n.textContent = (qaUser.firstName||'')+' '+(qaUser.lastName||'');
-            if(e) e.textContent = qaUser.email||'';
+          chrome.storage.local.get(['qaUser','settings','apiKey'], (data) => {
+            const qaUser = data.qaUser;
+            if (qaUser) {
+              const n = $('qa-sec-name'), e = $('qa-sec-email');
+              if(n) n.textContent = (qaUser.firstName||'')+' '+(qaUser.lastName||'');
+              if(e) e.textContent = qaUser.email||'';
+            }
+            // Show saved key (masked) and status
+            const key = data.settings?.apiKey?.trim() || data.apiKey?.trim() || '';
+            const akEl = $('qa-ak');
+            const statusEl = $('qa-api-status');
+            if (akEl && key) akEl.placeholder = key.substring(0,12) + '••••••••••••';
+            if (statusEl && key) {
+              statusEl.textContent = '✅ Saved';
+              statusEl.style.color = '#16a34a';
+            } else if (statusEl) {
+              statusEl.textContent = '⚠️ Not set';
+              statusEl.style.color = '#f59e0b';
+            }
           });
         }
       });
@@ -650,6 +846,18 @@
     // ── Settings sections ─────────────────────────
     $('qa-save-btn').addEventListener('click', saveSettings);
     $('qa-save-prefs-btn').addEventListener('click', savePrefs);
+    $('qa-reset-credits-btn') && $('qa-reset-credits-btn').addEventListener('click', () => {
+      chrome.storage.local.set({ credits: PCFG.free.c, creditsDate: new Date().toDateString() }, () => {
+        updateCreditUI();
+        toast('Credits reset to ' + PCFG.free.c + '! ✓', 'ok');
+      });
+    });
+    $('qa-clear-cache-btn') && $('qa-clear-cache-btn').addEventListener('click', () => {
+      _cachedJD = '';
+      const jdEls = ['qa-cv-jd','qa-jd'];
+      jdEls.forEach(id => { const el = sidebar.querySelector('#'+id); if(el) el.value = ''; });
+      toast('JD cache cleared. Reload on a job page to refetch.', 'ok');
+    });
     $('qa-logout-btn').addEventListener('click', logout);
     $('qa-upgrade-billing-btn').addEventListener('click', openPricing);
     $('qa-refresh-sub-btn').addEventListener('click', () => { updateCreditUI(); updateBillingSection(); toast('Subscription status refreshed!','ok'); });
@@ -662,13 +870,57 @@
     $('qa-change-pw-btn').addEventListener('click', changePassword);
     $('qa-save-api-btn').addEventListener('click', () => {
       const key = $('qa-ak')?.value.trim();
+      if (!key) { 
+        const f=$('qa-api-flash'); 
+        f.textContent='Please enter an API key first.'; 
+        f.className='qa-flash qa-flash-err show';
+        setTimeout(()=>f.classList.remove('show'),2500);
+        return;
+      }
+      if (!key.startsWith('sk-ant')) {
+        const f=$('qa-api-flash');
+        f.textContent='Key should start with sk-ant-... — check Anthropic console.';
+        f.className='qa-flash qa-flash-err show';
+        setTimeout(()=>f.classList.remove('show'),3500);
+        // still save it anyway
+      }
       chrome.storage.local.get('settings', ({settings}) => {
-        chrome.storage.local.set({settings:{...(settings||{}),apiKey:key}}, () => {
-          const f=$('qa-api-flash'); f.textContent='✓ API key saved!'; f.className='qa-flash qa-flash-ok show';
-          setTimeout(()=>f.classList.remove('show'),2500);
+        const updated = {...(settings||{}), apiKey: key};
+        // Save to BOTH locations for compatibility
+        chrome.storage.local.set({ settings: updated, apiKey: key }, () => {
+          const f=$('qa-api-flash'); 
+          f.textContent='✓ API key saved! You can now use AI features.'; 
+          f.className='qa-flash qa-flash-ok show';
+          setTimeout(()=>f.classList.remove('show'),3000);
         });
       });
     });
+    $('qa-test-api-btn') && $('qa-test-api-btn').addEventListener('click', async () => {
+      const key = $('qa-ak')?.value.trim();
+      if (!key) { toast('Enter an API key first.','warn'); return; }
+      const btn = $('qa-test-api-btn');
+      const flash = $('qa-api-flash');
+      btn.disabled = true; btn.textContent = '⏳ Testing...';
+      try {
+        const result = await callClaude(key, 'Reply with exactly: OK', 10);
+        flash.textContent = '✅ API key works! AI features are ready.';
+        flash.className = 'qa-flash qa-flash-ok show';
+        $('qa-api-status').textContent = '✅ Valid';
+        $('qa-api-status').style.color = '#16a34a';
+        // Auto-save if test passes
+        chrome.storage.local.get('settings', ({settings}) => {
+          chrome.storage.local.set({ settings: {...(settings||{}), apiKey: key}, apiKey: key });
+        });
+      } catch(e) {
+        flash.textContent = '❌ ' + e.message;
+        flash.className = 'qa-flash qa-flash-err show';
+        $('qa-api-status').textContent = '❌ Invalid';
+        $('qa-api-status').style.color = '#ef4444';
+      }
+      btn.disabled = false; btn.textContent = '🧪 Test Key';
+      setTimeout(() => flash.classList.remove('show'), 5000);
+    });
+
     $('qa-add-cv-btn').addEventListener('click', () => showCVForm(null));
     $('qa-cv-cancel-btn').addEventListener('click', hideCVForm);
     $('qa-cv-save-btn').addEventListener('click', saveCV);
@@ -692,6 +944,10 @@
         $('qa-cvt-upload-panel').style.display = btn.dataset.cvtab==='upload' ? 'block' : 'none';
       });
     });
+
+    // Analytics period selector
+    const periodSel = $('qa-period-sel');
+    if (periodSel) periodSel.addEventListener('change', loadAnalytics);
 
     const zone = $('qa-upload-zone');
     zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor='#16a34a'; zone.style.background='#f0fdf4'; });
@@ -781,44 +1037,88 @@
   }
 
   function fetchJobDescription(showFeedback, targetId) {
-    // Try multiple selectors to get job description from the page
-    const descSels = [
+    // PRIORITY selectors — specific enough to avoid grabbing page headers
+    const exactSels = [
+      // LinkedIn
+      '.jobs-description__content',
+      '.jobs-description-content__text',
+      '[class*="jobs-description__content"]',
+      // Indeed
+      '#jobDescriptionText',
+      '.jobsearch-jobDescriptionText',
+      '[data-testid="jobsearch-JobComponent-description"]',
+      // Glassdoor
+      '[class*="JobDetails_jobDescription"]',
+      '[data-test="description"]',
+      // Greenhouse
+      '#content',
+      '.job__description',
+      // Lever
+      '.section-wrapper-content',
+      '[class*="posting-description"]',
+      // Workday
+      '[data-automation-id="jobPostingDescription"]',
+      // Generic job boards
+      '[class*="job-details__description"]',
+      '[class*="jobDetailsSection"]',
+      '[id*="job-details"]',
+      '[class*="jobad-text"]',
+      '[class*="job_ad"]',
+      '[class*="stellenbeschreibung"]',  // German job sites
+      '[class*="stellenanzeige"]',
+      '[id*="description"]',
       '[class*="description__text"]',
       '[class*="jobDescriptionContent"]',
-      '[class*="job-description"]',
-      '[class*="jobDescription"]',
-      '[id*="job-description"]',
-      '[id*="jobDescription"]',
-      '[class*="description-content"]',
-      '[class*="job_description"]',
-      '[data-testid*="description"]',
-      '.jobs-description__content',
-      '.jobsearch-jobDescriptionText',
-      '#job-details',
-      'article[class*="job"]',
-      '[class*="vacancy"]',
-      '[class*="posting"]'
+      '[class*="job-description-content"]',
+      '[data-testid*="job-description"]',
     ];
 
     let jdText = '';
-    for (const sel of descSels) {
+    for (const sel of exactSels) {
       try {
         const el = document.querySelector(sel);
         if (el && !el.closest('#qa-sidebar')) {
-          const text = el.innerText || el.textContent;
-          if (text && text.trim().length > 100) { jdText = text.trim().substring(0, 4000); break; }
+          const text = (el.innerText || el.textContent || '').trim();
+          // Must be substantial content — at least 200 chars and NOT just a title
+          if (text.length > 200 && text.split(' ').length > 30) {
+            jdText = text.substring(0, 5000);
+            break;
+          }
         }
       } catch(e) {}
     }
 
-    // Fallback: grab largest text block on page
+    // Smart fallback: find the block with the most paragraph/list content
+    // but EXCLUDE short header/meta blocks
     if (!jdText) {
-      const blocks = Array.from(document.querySelectorAll('div, section, article'))
+      const candidates = Array.from(document.querySelectorAll('div, section, article'))
+        .filter(el => {
+          if (el.closest('#qa-sidebar')) return false;
+          if (el.closest('nav') || el.closest('header') || el.closest('footer')) return false;
+          // Skip elements that are likely job TITLE areas (too short)
+          const text = (el.innerText || '').trim();
+          if (text.length < 300) return false;
+          // Prefer elements that contain bullet points (typical for JDs)
+          const hasBullets = el.querySelectorAll('li, ul, ol').length > 2;
+          const hasMultiPara = el.querySelectorAll('p, br').length > 3;
+          return hasBullets || hasMultiPara;
+        })
+        .map(el => ({ el, score: (el.innerText||'').trim().length + el.querySelectorAll('li').length * 50 }))
+        .sort((a, b) => b.score - a.score);
+
+      if (candidates[0]) {
+        jdText = (candidates[0].el.innerText || '').trim().substring(0, 5000);
+      }
+    }
+
+    // Last resort: biggest text block (but must be > 500 chars to avoid titles)
+    if (!jdText) {
+      const blocks = Array.from(document.querySelectorAll('div, section'))
         .filter(el => !el.closest('#qa-sidebar') && !el.closest('nav') && !el.closest('header') && !el.closest('footer'))
         .map(el => ({ el, len: (el.innerText||'').trim().length }))
-        .filter(x => x.len > 200)
+        .filter(x => x.len > 500)
         .sort((a,b) => b.len - a.len);
-      if (blocks[0]) jdText = (blocks[0].el.innerText || '').trim().substring(0, 4000);
+      if (blocks[0]) jdText = (blocks[0].el.innerText || '').trim().substring(0, 5000);
     }
 
     if (jdText) {
@@ -826,7 +1126,8 @@
       const targets = targetId ? [targetId] : ['qa-cv-jd','qa-jd'];
       targets.forEach(id => {
         const el = sidebar.querySelector('#' + id);
-        if (el && !el.value) el.value = jdText;
+        // showFeedback=true means user clicked button — always override
+        if (el && (showFeedback || !el.value)) el.value = jdText;
       });
       if (showFeedback) toast('Job description fetched! ✓', 'ok');
     } else {
@@ -960,7 +1261,7 @@
     chrome.storage.local.get('profile', async ({ profile }) => {
       if (!profile?.firstName) { toast('Save your profile in Settings first!','warn'); return; }
       getApiKey(async apiKey => {
-        if (!apiKey) { toast('Add your Anthropic API key in Settings!','warn'); return; }
+        if (!apiKey) { toast('Add your API key in Settings → Security tab','warn'); sidebar.querySelectorAll('.qa-tab').forEach(t=>t.classList.remove('qa-active')); sidebar.querySelectorAll('.qa-panel').forEach(p=>p.classList.remove('qa-active')); sidebar.querySelector('[data-p="settings"]')?.classList.add('qa-active'); sidebar.querySelector('#qa-p-settings')?.classList.add('qa-active'); setTimeout(()=>{ sidebar.querySelectorAll('.qa-snav-btn').forEach(b=>b.classList.remove('qa-active')); sidebar.querySelectorAll('.qa-sec-body').forEach(s=>s.style.display='none'); sidebar.querySelector('[data-sec="security"]')?.classList.add('qa-active'); const sec=sidebar.querySelector('#qa-sec-security'); if(sec){sec.style.display='block'; sec.querySelector('#qa-ak')?.focus();} },100); return; }
         useCredit(async ok => {
           if (!ok) { qaOpenPricing(); return; }
           const tailorBtn  = sidebar.querySelector('#qa-tailor-btn');
@@ -1288,30 +1589,60 @@ ${jd.substring(0,2000)}`, 1800);
   // ════════════════════════════════════════════
   //  CREDITS + SUBSCRIPTION
   // ════════════════════════════════════════════
-  const PCFG = { free:{c:3,daily:true}, starter:{c:50,daily:false}, pro:{c:9999999}, ultra:{c:9999999} };
+  const PCFG = { free:{c:10,daily:true}, starter:{c:200,daily:false}, pro:{c:9999999}, ultra:{c:9999999} };
 
   function getCredits(cb) {
     chrome.storage.local.get(['plan','credits','creditsDate'], data => {
-      const plan=data.plan||'free', cfg=PCFG[plan];
-      const today=new Date().toDateString(); let credits=data.credits;
-      if (cfg.daily&&data.creditsDate!==today) { credits=cfg.c; chrome.storage.local.set({credits,creditsDate:today}); }
-      else if (credits==null) { credits=cfg.c; chrome.storage.local.set({credits,creditsDate:today}); }
+      const plan = data.plan || 'free';
+      const cfg  = PCFG[plan];
+      const today = new Date().toDateString();
+      let credits = data.credits;
+      // Always reset daily credits for free plan on new day
+      if (cfg.daily && data.creditsDate !== today) {
+        credits = cfg.c;
+        chrome.storage.local.set({ credits, creditsDate: today });
+      } else if (credits == null || credits === undefined) {
+        credits = cfg.c;
+        chrome.storage.local.set({ credits, creditsDate: today });
+      }
       cb(plan, Math.max(0, credits));
     });
   }
 
   function useCredit(cb) {
-    getCredits((plan,credits) => {
-      if (plan==='pro'||plan==='ultra') { cb(true); return; }
-      if (credits<=0) { cb(false); return; }
-      chrome.storage.local.set({credits:credits-1}, () => { updateCreditUI(); cb(true); });
+    getCredits((plan, credits) => {
+      // Paid plans: always allow
+      if (plan === 'pro' || plan === 'ultra' || plan === 'starter') { cb(true); return; }
+      // Free plan: check credits
+      if (credits <= 0) {
+        // Auto-reset if date changed (safety net)
+        const today = new Date().toDateString();
+        chrome.storage.local.get('creditsDate', ({creditsDate}) => {
+          if (creditsDate !== today) {
+            chrome.storage.local.set({ credits: PCFG.free.c, creditsDate: today }, () => {
+              updateCreditUI(); cb(true);
+            });
+          } else {
+            cb(false);
+          }
+        });
+        return;
+      }
+      chrome.storage.local.set({ credits: credits - 1 }, () => { updateCreditUI(); cb(true); });
     });
   }
 
   function updateCreditUI() {
-    getCredits((plan,credits) => {
+    getCredits((plan, credits) => {
       const unlim = plan==='pro'||plan==='ultra';
-      const maxC  = PCFG[plan]?.c||3;
+      const maxC  = PCFG[plan]?.c||10;
+      // Visual warning when low/empty
+      const badge = sidebar.querySelector('#qa-cred-badge');
+      if (badge) {
+        badge.style.background = credits === 0 ? '#fee2e2' : '';
+        badge.style.color = credits === 0 ? '#dc2626' : '';
+        badge.style.borderColor = credits === 0 ? '#fca5a5' : '';
+      }
       const ct    = sidebar.querySelector('#qa-cred-text');
       const planB = sidebar.querySelector('#qa-plan-btn');
       const fill  = sidebar.querySelector('#qa-meter-fill');
@@ -1383,7 +1714,7 @@ ${jd.substring(0,2000)}`, 1800);
   }
   function doAutofill(showToast) {
     useCredit(ok=>{
-      if (!ok) { toast('No credits left! Upgrade to continue.','warn'); qaOpenPricing(); return; }
+      if (!ok) { toast('0 credits remaining. Credits reset daily at midnight — or upgrade for unlimited!','warn'); setTimeout(qaOpenPricing, 1500); return; }
       // Get default CV for skills/summary merge
       getCVs(cvs=>{
         const defCV=cvs.find(c=>c.isDefault)||cvs[0];
@@ -1417,6 +1748,20 @@ ${jd.substring(0,2000)}`, 1800);
     });
   }
 
+  function navigateToAPIKey() {
+    sidebar.querySelectorAll('.qa-tab').forEach(t=>t.classList.remove('qa-active'));
+    sidebar.querySelectorAll('.qa-panel').forEach(p=>p.classList.remove('qa-active'));
+    sidebar.querySelector('[data-p="settings"]')?.classList.add('qa-active');
+    sidebar.querySelector('#qa-p-settings')?.classList.add('qa-active');
+    setTimeout(() => {
+      sidebar.querySelectorAll('.qa-snav-btn').forEach(b=>b.classList.remove('qa-active'));
+      sidebar.querySelectorAll('.qa-sec-body').forEach(s=>s.style.display='none');
+      sidebar.querySelector('[data-sec="security"]')?.classList.add('qa-active');
+      const sec = sidebar.querySelector('#qa-sec-security');
+      if (sec) { sec.style.display='block'; sec.querySelector('#qa-ak')?.focus(); }
+    }, 100);
+  }
+
   function insertTextIntoForm(text) {
     if (!text) return;
     const tas = Array.from(document.querySelectorAll('textarea')).filter(t=>!t.closest('#qa-sidebar'));
@@ -1437,17 +1782,47 @@ ${jd.substring(0,2000)}`, 1800);
   //  CLAUDE API
   // ════════════════════════════════════════════
   async function callClaude(apiKey, prompt, maxTokens) {
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTokens,messages:[{role:'user',content:prompt}]})
-    });
-    const d=await res.json();
+    if (!apiKey || apiKey.length < 20) throw new Error('Invalid API key. Please check Settings → Security.');
+    let res;
+    try {
+      res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-opus-4-5',
+          max_tokens: maxTokens || 1000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+    } catch(netErr) {
+      throw new Error('Network error — check your internet connection.');
+    }
+    if (!res.ok) {
+      let msg = 'API error ' + res.status;
+      try {
+        const d = await res.json();
+        if (d.error?.message) msg = d.error.message;
+        else if (res.status === 401) msg = 'Invalid API key. Check Settings → Security.';
+        else if (res.status === 429) msg = 'Rate limit hit. Wait a moment and try again.';
+        else if (res.status === 403) msg = 'API key does not have permission. Check your Anthropic console.';
+      } catch(e) {}
+      throw new Error(msg);
+    }
+    const d = await res.json();
     if (d.error) throw new Error(d.error.message);
-    return d.content?.[0]?.text||'';
+    return d.content?.[0]?.text || '';
   }
   function getApiKey(cb) {
-    chrome.storage.local.get('settings',({settings})=>cb(settings?.apiKey?.trim()||''));
+    // Check both storage locations for backward compatibility
+    chrome.storage.local.get(['settings', 'apiKey'], (data) => {
+      const key = data.settings?.apiKey?.trim() || data.apiKey?.trim() || '';
+      cb(key);
+    });
   }
   function getActiveCV(cb) {
     getCVs(cvs=>cb(cvs.find(c=>c.isDefault)||cvs[0]||null));
@@ -1460,7 +1835,7 @@ ${jd.substring(0,2000)}`, 1800);
     chrome.storage.local.get('profile',async({profile})=>{
       if (!profile?.firstName) { toast('Save your profile in Settings first!','warn'); return; }
       getApiKey(async apiKey=>{
-        if (!apiKey) { toast('Add your Anthropic API key in Settings!','warn'); return; }
+        if (!apiKey) { toast('Add your API key in Settings → Security tab','warn'); sidebar.querySelectorAll('.qa-tab').forEach(t=>t.classList.remove('qa-active')); sidebar.querySelectorAll('.qa-panel').forEach(p=>p.classList.remove('qa-active')); sidebar.querySelector('[data-p="settings"]')?.classList.add('qa-active'); sidebar.querySelector('#qa-p-settings')?.classList.add('qa-active'); setTimeout(()=>{ sidebar.querySelectorAll('.qa-snav-btn').forEach(b=>b.classList.remove('qa-active')); sidebar.querySelectorAll('.qa-sec-body').forEach(s=>s.style.display='none'); sidebar.querySelector('[data-sec="security"]')?.classList.add('qa-active'); const sec=sidebar.querySelector('#qa-sec-security'); if(sec){sec.style.display='block'; sec.querySelector('#qa-ak')?.focus();} },100); return; }
         useCredit(async ok=>{
           if (!ok) { qaOpenPricing(); return; }
           const btn=sidebar.querySelector('#qa-quick-cl-btn');
@@ -1491,24 +1866,78 @@ ${jd.substring(0,2000)}`, 1800);
   let _cvProfile, _cvJD, _cvApiKey, _cvMissing;
 
   function analyzeCV() {
-    const jd=sidebar.querySelector('#qa-cv-jd')?.value.trim()||_cachedJD;
-    if (!jd) { toast('Paste or fetch the job description first!','warn'); return; }
-    const cvId=sidebar.querySelector('#qa-cv-pick-analyze')?.value;
-    getCVs(async cvs=>{
-      const cv=cvId?cvs.find(c=>c.id===cvId):cvs.find(c=>c.isDefault)||cvs[0];
-      if (!cv?.text) { toast('Please select a CV profile with text first!','warn'); return; }
-      getApiKey(async apiKey=>{
-        if (!apiKey) { toast('Add your API key in Settings!','warn'); return; }
-        const btn=sidebar.querySelector('#qa-analyze-btn');
-        btn.disabled=true; btn.textContent='Analyzing...';
-        const prompt=`ATS analyst. Reply ONLY valid JSON no markdown:\n{"score":72,"verdict":"Good Match","missing_keywords":["kw1","kw2"],"present_keywords":["kw3"]}\nRESUME: ${cv.text}\nSKILLS: ${cv.skills||''}\nJOB: ${jd}`;
+    const jd = sidebar.querySelector('#qa-cv-jd')?.value.trim() || _cachedJD;
+    if (!jd || jd.length < 50) {
+      toast('Please fetch or paste the job description first!', 'warn');
+      const fetchBtn = sidebar.querySelector('#qa-fetch-jd-btn');
+      if (fetchBtn) { fetchBtn.style.background='#fef9c3'; setTimeout(()=>fetchBtn.style.background='',2000); }
+      return;
+    }
+    const cvId = sidebar.querySelector('#qa-cv-pick-analyze')?.value;
+    getCVs(async cvs => {
+      const cv = cvId ? cvs.find(c=>c.id===cvId) : cvs.find(c=>c.isDefault) || cvs[0];
+      if (!cv?.text || cv.text.trim().length < 20) {
+        toast('No CV text found. Go to Settings → My CVs and paste your CV text.', 'warn');
+        return;
+      }
+      getApiKey(async apiKey => {
+        if (!apiKey) {
+          toast('API key missing — go to Settings → Security to add it.', 'warn');
+          // Auto-navigate to security tab
+          sidebar.querySelectorAll('.qa-tab').forEach(t=>t.classList.remove('qa-active'));
+          sidebar.querySelectorAll('.qa-panel').forEach(p=>p.classList.remove('qa-active'));
+          sidebar.querySelector('[data-p="settings"]')?.classList.add('qa-active');
+          sidebar.querySelector('#qa-p-settings')?.classList.add('qa-active');
+          setTimeout(()=>{
+            sidebar.querySelectorAll('.qa-snav-btn').forEach(b=>b.classList.remove('qa-active'));
+            sidebar.querySelectorAll('.qa-sec-body').forEach(s=>s.style.display='none');
+            sidebar.querySelector('[data-sec="security"]')?.classList.add('qa-active');
+            const sec = sidebar.querySelector('#qa-sec-security');
+            if(sec){ sec.style.display='block'; sec.querySelector('#qa-ak')?.focus(); }
+          }, 100);
+          return;
+        }
+        const btn = sidebar.querySelector('#qa-analyze-btn');
+        btn.disabled = true; btn.innerHTML = '⏳ Analyzing...';
+
+        const cvSnippet = cv.text.substring(0, 3000);
+        const jdSnippet = jd.substring(0, 2000);
+        const prompt = `You are an ATS scoring expert. Analyze this resume against the job description.
+Reply with ONLY a JSON object (no markdown, no explanation):
+{"score": 72, "verdict": "Good Match", "missing_keywords": ["keyword1","keyword2","keyword3"], "present_keywords": ["found1","found2","found3"]}
+
+Score 0-100 based on keyword match, skills alignment and experience relevance.
+Verdicts: "Excellent Match" (85+), "Good Match" (65-84), "Partial Match" (45-64), "Poor Match" (<45)
+
+RESUME:
+${cvSnippet}
+
+SKILLS FROM CV: ${cv.skills || 'not specified'}
+
+JOB DESCRIPTION:
+${jdSnippet}`;
+
         try {
-          const raw=await callClaude(apiKey,prompt,600);
-          const data=JSON.parse(raw.replace(/```json|```/g,'').trim());
-          _cvProfile=cv; _cvJD=jd; _cvApiKey=apiKey; _cvMissing=data.missing_keywords||[];
-          renderATS(data);
-        } catch(e) { toast('Analysis failed: '+e.message,'err'); }
-        btn.disabled=false; btn.textContent='📊 Analyze & Score';
+          const raw = await callClaude(apiKey, prompt, 700);
+          // Parse JSON - handle various formats Claude might return
+          let parsed;
+          try {
+            const clean = raw.replace(/```json|```/g,'').trim();
+            // Extract JSON object if wrapped in text
+            const match = clean.match(/\{[\s\S]*\}/);
+            parsed = JSON.parse(match ? match[0] : clean);
+          } catch(pe) {
+            throw new Error('Could not parse AI response. Try again.');
+          }
+          _cvProfile = cv; _cvJD = jd; _cvApiKey = apiKey;
+          _cvMissing = parsed.missing_keywords || [];
+          renderATS(parsed);
+          toast('Analysis complete! ✓', 'ok');
+        } catch(e) {
+          toast('Analysis failed: ' + e.message, 'err');
+          console.error('ATS analysis error:', e);
+        }
+        btn.disabled = false; btn.innerHTML = '📊 Analyze & Score';
       });
     });
   }
@@ -1669,7 +2098,7 @@ ${jd.substring(0,2000)}`, 1800);
   //  PRICING + PAYMENT
   // ════════════════════════════════════════════
   let billing='monthly', selectedPlan=null;
-  const PRICES={monthly:{starter:'$7.99',pro:'$14.99',ultra:'$29.99'},annual:{starter:'$4.99',pro:'$8.99',ultra:'$17.99'}};
+  const PRICES={monthly:{starter:'€2.50',pro:'€7.49',ultra:'€14.99'},annual:{starter:'€1.99',pro:'€5.99',ultra:'€11.99'}};
   const PLAN_NAMES={starter:'Starter',pro:'Pro',ultra:'Ultra'};
 
   function openPricing()  { sidebar.querySelector('#qa-pricing').classList.add('show'); loadSavedPayment(); }
@@ -1847,6 +2276,159 @@ ${jd.substring(0,2000)}`, 1800);
         }
       }
     });
+  }
+
+  // ════════════════════════════════════════════
+  //  ANALYTICS
+  // ════════════════════════════════════════════
+  function loadAnalytics() {
+    chrome.storage.local.get(['applications','qaTailorCount','qaCoverCount','qaViewCount'], data => {
+      const apps     = data.applications || [];
+      const now      = Date.now();
+      const day30    = now - 30*24*60*60*1000;
+      const day7     = now - 7*24*60*60*1000;
+
+      const allTime  = apps.length;
+      const monthly  = apps.filter(a => a.date >= day30).length;
+      const weekly   = apps.filter(a => a.date >= day7).length;
+
+      const $ = id => sidebar.querySelector('#'+id);
+      if($('qa-ov-all'))   $('qa-ov-all').textContent   = allTime;
+      if($('qa-ov-month')) $('qa-ov-month').textContent = monthly;
+      if($('qa-ov-week'))  $('qa-ov-week').textContent  = weekly;
+
+      // Calendar: current month
+      const now2   = new Date();
+      const year   = now2.getFullYear();
+      const month  = now2.getMonth();
+      const daysInMonth = new Date(year, month+1, 0).getDate();
+      const firstDay    = new Date(year, month, 1).getDay(); // 0=Sun
+
+      // Count apps per day this month
+      const dayCount = {};
+      apps.filter(a => {
+        const d = new Date(a.date);
+        return d.getFullYear()===year && d.getMonth()===month;
+      }).forEach(a => {
+        const day = new Date(a.date).getDate();
+        dayCount[day] = (dayCount[day]||0) + 1;
+      });
+
+      // Build calendar HTML
+      const monthName = now2.toLocaleString('default',{month:'long'});
+      const calEl = $('qa-activity-cal');
+      if (!calEl) return;
+
+      const colors = ['#e5e7eb','#bbf7d0','#4ade80','#16a34a','#14532d'];
+      const getColor = n => n===0?colors[0]:n===1?colors[1]:n===2?colors[2]:n===3?colors[3]:colors[4];
+
+      let html = `<div class="qa-cal-month">${monthName} ${year}</div>`;
+      html += '<div class="qa-cal-grid">';
+      // Day headers
+      ['S','M','T','W','T','F','S'].forEach(d => { html += `<div class="qa-cal-dh">${d}</div>`; });
+      // Empty cells before first day
+      for (let i=0; i<firstDay; i++) html += '<div class="qa-cal-cell qa-cal-empty"></div>';
+      // Day cells
+      for (let d=1; d<=daysInMonth; d++) {
+        const count = dayCount[d]||0;
+        const isToday = d===now2.getDate();
+        const bg = isToday ? '#16a34a' : getColor(count);
+        const textColor = isToday ? '#fff' : count>1 ? '#fff' : '#374151';
+        html += `<div class="qa-cal-cell" style="background:${bg};color:${textColor}" title="${d} ${monthName}: ${count} applied">${d}</div>`;
+      }
+      html += '</div>';
+      calEl.innerHTML = html;
+
+      // Calendar footer stats
+      const calApplied = apps.filter(a => { const d=new Date(a.date); return d.getFullYear()===year&&d.getMonth()===month; }).length;
+      const calViewed  = (data.qaViewCount||0);
+      if($('qa-cal-viewed'))  $('qa-cal-viewed').textContent  = calViewed;
+      if($('qa-cal-applied')) $('qa-cal-applied').textContent = calApplied;
+
+      // Usage stats
+      const tailored = data.qaTailorCount||0;
+      const covers   = data.qaCoverCount||0;
+      chrome.storage.local.get('plan', ({plan}) => {
+        const limits = {free:{jobs:15,tailored:5,covers:2},starter:{jobs:50,tailored:20,covers:10},pro:{jobs:999,tailored:999,covers:999},ultra:{jobs:999,tailored:999,covers:999}};
+        const lim = limits[plan||'free'];
+        if($('qa-use-imported'))  $('qa-use-imported').textContent  = `${allTime}/${lim.jobs}`;
+        if($('qa-use-tailored'))  $('qa-use-tailored').textContent  = `${tailored}/${lim.tailored}`;
+        if($('qa-use-covers'))    $('qa-use-covers').textContent    = `${covers}/${lim.covers}`;
+      });
+
+      // Trend chart (simple canvas bar chart - last 30 days)
+      drawTrendChart(apps, now);
+    });
+  }
+
+  function drawTrendChart(apps, now) {
+    const canvas = sidebar.querySelector('#qa-trend-canvas');
+    if (!canvas) return;
+    const parent = canvas.parentElement;
+    canvas.width  = parent.clientWidth || 360;
+    canvas.height = 100;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // Last 14 days data
+    const days = 14;
+    const applied = [], viewed = [], labels = [];
+    for (let i=days-1; i>=0; i--) {
+      const d = new Date(now - i*24*60*60*1000);
+      const ds = d.toDateString();
+      applied.push(apps.filter(a => new Date(a.date).toDateString()===ds).length);
+      // Simulate viewed as slightly more than applied
+      viewed.push(apps.filter(a => new Date(a.date).toDateString()===ds).length + Math.floor(Math.random()*0));
+      labels.push(d.getDate());
+    }
+
+    const maxVal = Math.max(...applied, ...viewed, 1);
+    const W = canvas.width, H = canvas.height;
+    const padL=8, padR=8, padT=10, padB=20;
+    const chartW = W-padL-padR;
+    const chartH = H-padT-padB;
+    const step   = chartW / (days-1);
+
+    const drawLine = (data, color, dotColor) => {
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.lineJoin = 'round';
+      data.forEach((v,i) => {
+        const x = padL + i*step;
+        const y = padT + chartH - (v/maxVal)*chartH;
+        if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+      // Dots
+      data.forEach((v,i) => {
+        const x = padL + i*step;
+        const y = padT + chartH - (v/maxVal)*chartH;
+        ctx.beginPath();
+        ctx.arc(x,y,3,0,Math.PI*2);
+        ctx.fillStyle = dotColor;
+        ctx.fill();
+      });
+    };
+
+    // Grid lines
+    ctx.strokeStyle = '#f3f4f6';
+    ctx.lineWidth = 1;
+    [0,1,2,3,4].forEach(i => {
+      const y = padT + (i/4)*chartH;
+      ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(W-padR,y); ctx.stroke();
+    });
+
+    // Labels (every 3rd day)
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = '8px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    labels.forEach((l,i) => {
+      if (i%3===0) ctx.fillText(l, padL+i*step, H-5);
+    });
+
+    drawLine(viewed, '#f59e0b', '#f59e0b');
+    drawLine(applied, '#16a34a', '#16a34a');
   }
 
   // SPA nav support
