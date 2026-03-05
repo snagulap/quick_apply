@@ -87,6 +87,16 @@
       <button id="qa-renew-btn">Renew →</button>
     </div>
 
+    <!-- Setup banner for new users -->
+    <div id="qa-setup-banner" class="qa-setup-banner" style="display:none">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:800;color:#111827">⚡ Set up AI features</div>
+        <div style="font-size:10px;color:#6b7280;margin-top:1px">Add your FREE Gemini key to enable CV tailoring</div>
+      </div>
+      <button class="qa-btn qa-btn-green" style="width:auto;padding:5px 10px;font-size:10px;white-space:nowrap" id="qa-setup-btn">Add Key →</button>
+      <span id="qa-setup-close" style="font-size:14px;color:#9ca3af;cursor:pointer;padding:2px 4px;flex-shrink:0">✕</span>
+    </div>
+
     <div class="qa-job-bar">
       <div class="qa-job-title" id="qa-job-title">Detecting job...</div>
       <div class="qa-job-meta" id="qa-job-meta"><span>${PLATFORM}</span></div>
@@ -339,15 +349,15 @@
             <div class="qa-flash" id="qa-pw-flash" style="margin-top:8px"></div>
           </div>
           <div class="qa-sec-card" style="margin-top:10px">
-            <div class="qa-sec-card-title">AI Configuration</div>
+            <div class="qa-sec-card-title">AI Configuration <span style="background:#dcfce7;color:#16a34a;font-size:9px;padding:2px 7px;border-radius:20px;font-weight:700;margin-left:6px">FREE</span></div>
             <div class="qa-field" style="margin-top:8px">
               <label style="display:flex;align-items:center;justify-content:space-between">
-                Anthropic API Key
+                Gemini API Key (FREE)
                 <span id="qa-api-status" style="font-size:10px;font-weight:700"></span>
               </label>
-              <input type="password" id="qa-ak" placeholder="sk-ant-api03-..."/>
+              <input type="password" id="qa-ak" placeholder="AIza... (Gemini API key)"/>
             </div>
-            <div class="qa-api-note">Get a free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> · Stored locally, never sent to our servers</div>
+            <div class="qa-api-note">Get your FREE key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:#16a34a;font-weight:700">aistudio.google.com</a> · Free tier: 1,500 requests/day · No credit card needed</div>
             <div style="display:flex;gap:8px;margin-top:8px">
               <button class="qa-btn qa-btn-outline" style="flex:1" id="qa-save-api-btn">💾 Save API Key</button>
               <button class="qa-btn qa-btn-outline" style="flex:1" id="qa-test-api-btn">🧪 Test Key</button>
@@ -669,6 +679,14 @@
           <div class="qa-card-line"><label>Card</label><input id="qa-cn" placeholder="1234 5678 9012 3456" maxlength="19"/></div>
           <div class="qa-card-line"><label>Expires</label><input id="qa-ce" placeholder="MM / YY" maxlength="7" style="max-width:90px"/><label style="width:35px;padding-left:6px">CVC</label><input id="qa-cc" placeholder="123" maxlength="4" style="max-width:60px"/></div>
         </div>
+        <!-- PROMO CODE ROW -->
+        <div id="qa-promo-row" style="margin-bottom:12px">
+          <div style="display:flex;gap:6px">
+            <input id="qa-promo-input" placeholder="Promo / discount code" style="flex:1;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;outline:none;font-family:inherit"/>
+            <button class="qa-btn qa-btn-outline" style="width:auto;padding:8px 14px;font-size:11px;white-space:nowrap" id="qa-apply-promo">Apply</button>
+          </div>
+          <div id="qa-promo-msg" style="font-size:11px;margin-top:5px;display:none"></div>
+        </div>
         <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#374151;margin-bottom:10px;cursor:pointer"><input type="checkbox" id="qa-save-card" checked style="width:auto"/> Save card for renewals</label>
         <div class="qa-secure-note"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>256-bit SSL · Powered by Stripe</div>
         <button class="qa-btn qa-btn-green" id="qa-pay-btn">🔒 Subscribe Now</button>
@@ -830,7 +848,7 @@
             const key = data.settings?.apiKey?.trim() || data.apiKey?.trim() || '';
             const akEl = $('qa-ak');
             const statusEl = $('qa-api-status');
-            if (akEl && key) akEl.placeholder = key.substring(0,12) + '••••••••••••';
+            if (akEl && key) akEl.placeholder = key.substring(0,8) + '••••••••' + key.slice(-4);
             if (statusEl && key) {
               statusEl.textContent = '✅ Saved';
               statusEl.style.color = '#16a34a';
@@ -877,12 +895,12 @@
         setTimeout(()=>f.classList.remove('show'),2500);
         return;
       }
-      if (!key.startsWith('sk-ant')) {
+      if (!key.startsWith('AIza') && !key.startsWith('AIza')) {
+        // Gemini keys start with AIza — just warn, still save
         const f=$('qa-api-flash');
-        f.textContent='Key should start with sk-ant-... — check Anthropic console.';
+        f.textContent='Tip: Gemini keys usually start with AIza...';
         f.className='qa-flash qa-flash-err show';
-        setTimeout(()=>f.classList.remove('show'),3500);
-        // still save it anyway
+        setTimeout(()=>f.classList.remove('show'),3000);
       }
       chrome.storage.local.get('settings', ({settings}) => {
         const updated = {...(settings||{}), apiKey: key};
@@ -903,7 +921,7 @@
       btn.disabled = true; btn.textContent = '⏳ Testing...';
       try {
         const result = await callClaude(key, 'Reply with exactly: OK', 10);
-        flash.textContent = '✅ API key works! AI features are ready.';
+        flash.textContent = '✅ Gemini key works! All AI features ready.';
         flash.className = 'qa-flash qa-flash-ok show';
         $('qa-api-status').textContent = '✅ Valid';
         $('qa-api-status').style.color = '#16a34a';
@@ -912,7 +930,7 @@
           chrome.storage.local.set({ settings: {...(settings||{}), apiKey: key}, apiKey: key });
         });
       } catch(e) {
-        flash.textContent = '❌ ' + e.message;
+        flash.textContent = '❌ ' + e.message + ' — Make sure you copied the full key from aistudio.google.com';
         flash.className = 'qa-flash qa-flash-err show';
         $('qa-api-status').textContent = '❌ Invalid';
         $('qa-api-status').style.color = '#ef4444';
@@ -959,6 +977,24 @@
     $('qa-plan-btn').addEventListener('click', openPricing);
     $('qa-pricing-close').addEventListener('click', closePricing);
     $('qa-renew-btn').addEventListener('click', openPricing);
+    $('qa-setup-btn') && $('qa-setup-btn').addEventListener('click', () => {
+      $('qa-setup-banner').style.display = 'none';
+      // Navigate to Security tab
+      sidebar.querySelectorAll('.qa-tab').forEach(t=>t.classList.remove('qa-active'));
+      sidebar.querySelectorAll('.qa-panel').forEach(p=>p.classList.remove('qa-active'));
+      sidebar.querySelector('[data-p="settings"]')?.classList.add('qa-active');
+      sidebar.querySelector('#qa-p-settings')?.classList.add('qa-active');
+      setTimeout(()=>{
+        sidebar.querySelectorAll('.qa-snav-btn').forEach(b=>b.classList.remove('qa-active'));
+        sidebar.querySelectorAll('.qa-sec-body').forEach(s=>s.style.display='none');
+        sidebar.querySelector('[data-sec="security"]')?.classList.add('qa-active');
+        const sec = sidebar.querySelector('#qa-sec-security');
+        if(sec){ sec.style.display='block'; sec.querySelector('#qa-ak')?.focus(); }
+      }, 100);
+    });
+    $('qa-setup-close') && $('qa-setup-close').addEventListener('click', () => {
+      $('qa-setup-banner').style.display = 'none';
+    });
     $('qa-bill-sw').addEventListener('click', toggleBilling);
     $('qa-b-mon').addEventListener('click', () => setBilling('monthly'));
     $('qa-b-ann').addEventListener('click', () => setBilling('annual'));
@@ -966,6 +1002,8 @@
     $('qa-sel-pro').addEventListener('click',     () => selectPlan('pro'));
     $('qa-sel-ultra').addEventListener('click',   () => selectPlan('ultra'));
     $('qa-pay-btn').addEventListener('click', processPayment);
+    $('qa-apply-promo').addEventListener('click', applyPromoCode);
+    $('qa-promo-input').addEventListener('keydown', e => { if(e.key==='Enter') applyPromoCode(); });
     $('qa-cn').addEventListener('input', e => { let v=e.target.value.replace(/\D/g,'').substring(0,16); e.target.value=v.replace(/(.{4})/g,'$1 ').trim(); });
     $('qa-ce').addEventListener('input', e => { let v=e.target.value.replace(/\D/g,'').substring(0,4); if(v.length>=2)v=v.substring(0,2)+' / '+v.substring(2); e.target.value=v; });
   }
@@ -1272,7 +1310,20 @@
           if(bottomBtn)  { bottomBtn.disabled=true;  bottomBtn.textContent='Tailoring...'; }
           getActiveCV(async cv => {
             const cvText = cv?.text || profile.summary || '';
-            if (!cvText) { toast('Add your CV text in Settings → My CVs first!','warn'); if(tailorBtn){tailorBtn.disabled=false;tailorBtn.innerHTML='<span>✨</span><span>Tailor Resume</span><span class="qa-btn-hint">< 30 sec</span>';} if(bottomBtn){bottomBtn.disabled=false;bottomBtn.textContent='✨ Tailor Resume';} return; }
+            if (!cvText || cvText.trim().length < 50) {
+              toast('No CV text found. Go to Settings → My CVs and add your CV.','warn');
+              if(tailorBtn){tailorBtn.disabled=false;tailorBtn.innerHTML='<span>✨</span><span>Tailor Resume</span><span class="qa-btn-hint">< 30 sec</span>';}
+              if(bottomBtn){bottomBtn.disabled=false;bottomBtn.textContent='✨ Tailor Resume';}
+              return;
+            }
+            // Detect if CV text is raw PDF binary (common mistake)
+            const isPDFBinary = cvText.startsWith('%PDF') || cvText.includes('\x00') || (cvText.match(/[\x00-\x08\x0e-\x1f]/g)||[]).length > 10;
+            if (isPDFBinary) {
+              toast('Your CV contains raw PDF data. Please re-upload your CV or paste the text manually in Settings → My CVs.','warn');
+              if(tailorBtn){tailorBtn.disabled=false;tailorBtn.innerHTML='<span>✨</span><span>Tailor Resume</span><span class="qa-btn-hint">< 30 sec</span>';}
+              if(bottomBtn){bottomBtn.disabled=false;bottomBtn.textContent='✨ Tailor Resume';}
+              return;
+            }
             try {
               const result = await callClaude(apiKey,
                 `You are an expert resume writer. Tailor this resume for maximum ATS match with the job description.
@@ -1496,37 +1547,190 @@ ${jd.substring(0,2000)}`, 1800);
     }
 
     if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+      statusEl.textContent = '📄 Reading PDF...';
       const reader = new FileReader();
       reader.onload = async e => {
+        // ── Method 1: Smart text extraction from PDF bytes ──────────────
+        let extracted = '';
         try {
-          // Extract text from PDF using basic parsing (works for text-based PDFs)
           const bytes = new Uint8Array(e.target.result);
-          const str = new TextDecoder('latin1').decode(bytes);
-          // Extract text between BT and ET markers (PDF text operators)
+          const str   = new TextDecoder('latin1').decode(bytes);
+
+          // Try multiple PDF text extraction strategies
           const texts = [];
-          const btEt = str.matchAll(/BT[\s\S]*?ET/g);
-          for (const m of btEt) {
-            const tjMatches = m[0].matchAll(/\(([^)]*)\)\s*Tj/g);
-            for (const tj of tjMatches) texts.push(tj[1].replace(/\\n/g,'\n').replace(/\\r/g,''));
+
+          // Strategy A: BT...ET blocks with Tj/TJ operators
+          const btEtBlocks = str.matchAll(/BT([\s\S]*?)ET/g);
+          for (const block of btEtBlocks) {
+            // Tj operator: (text)Tj
+            const tjMatches = block[1].matchAll(/\(([^)]{1,200})\)\s*Tj/g);
+            for (const m of tjMatches) {
+              const t = m[1].replace(/\\n/g,' ').replace(/\\r/g,'').replace(/\\/g,'').trim();
+              if (t.length > 1) texts.push(t);
+            }
+            // TJ operator: [(text)spacing(text)]TJ
+            const tjArrMatches = block[1].matchAll(/\[([^\]]*)\]\s*TJ/g);
+            for (const m of tjArrMatches) {
+              const parts = m[1].matchAll(/\(([^)]{1,200})\)/g);
+              for (const p of parts) {
+                const t = p[1].replace(/\\n/g,' ').replace(/\\/g,'').trim();
+                if (t.length > 1) texts.push(t);
+              }
+            }
           }
-          let extracted = texts.join(' ').replace(/\s+/g,' ').trim();
-          if (!extracted || extracted.length < 50) {
-            // Fallback: extract printable strings
-            extracted = str.replace(/[^\x20-\x7E\n]/g,' ').replace(/\s{3,}/g,'\n').trim().substring(0,5000);
+
+          if (texts.length > 5) {
+            extracted = texts.join(' ')
+              .replace(/([a-z])([A-Z])/g, '$1 $2')  // fix merged words
+              .replace(/\s{2,}/g, ' ')
+              .trim()
+              .substring(0, 8000);
           }
-          textEl.value = extracted || 'Could not extract text from this PDF. Please paste text manually.';
-          statusEl.textContent = `✓ ${file.name} processed`;
+
+          // Strategy B: Find readable text runs (for compressed/encoded PDFs)
+          if (!extracted || extracted.length < 100) {
+            const readable = [];
+            let run = '';
+            for (let i = 0; i < bytes.length; i++) {
+              const c = bytes[i];
+              if (c >= 32 && c < 127) {
+                run += String.fromCharCode(c);
+              } else {
+                if (run.length > 4) readable.push(run.trim());
+                run = '';
+              }
+            }
+            if (run.length > 4) readable.push(run.trim());
+            // Filter: keep only runs that look like real words/sentences
+            const filtered = readable
+              .filter(r => /[a-zA-Z]{3,}/.test(r) && !/^[\d\s.]+$/.test(r))
+              .join(' ')
+              .replace(/\s+/g, ' ')
+              .trim();
+            if (filtered.length > extracted.length) extracted = filtered.substring(0, 8000);
+          }
+        } catch(parseErr) {
+          console.warn('PDF parse error:', parseErr);
+        }
+
+        // ── Method 2: If extraction worked well — use it directly ────────
+        if (extracted && extracted.length > 200 && /[a-zA-Z]{4,}/.test(extracted)) {
+          // Clean up common PDF artifacts
+          extracted = extracted
+            .replace(/\b(cid:[0-9]+)\b/gi, '')
+            .replace(/EMC|BDC|BMC|\bq\b|\bQ\b|\bcm\b|\bTm\b|\bTd\b|\bTf\b/g, '')
+            .replace(/\s{2,}/g, ' ')
+            .replace(/([.!?])\s*([A-Z])/g, '$1\n$2')
+            .trim();
+
+          textEl.value = extracted;
+          statusEl.innerHTML = `✅ <strong>${file.name}</strong> extracted — ${extracted.split(' ').length} words`;
+          statusEl.style.color = '#16a34a';
           sidebar.querySelector('[data-cvtab="paste"]').click();
-          if (!extracted || extracted.length < 50) toast('PDF text extraction limited. Consider pasting text directly for best results.', 'warn');
-        } catch(err) { statusEl.textContent = 'Could not read PDF. Please paste your CV text instead.'; }
+          toast('CV extracted! Review the text above and fix any errors.', 'ok');
+          return;
+        }
+
+        // ── Method 3: Send PDF to Gemini Vision to extract text ──────────
+        statusEl.textContent = '🤖 Asking Gemini to read your PDF...';
+        getApiKey(async apiKey => {
+          if (!apiKey) {
+            // No API key — show manual paste option
+            textEl.value = '';
+            textEl.placeholder = 'PDF could not be auto-read. Please open your PDF, select all text (Ctrl+A), copy (Ctrl+C) and paste here.';
+            statusEl.innerHTML = '⚠️ Could not extract PDF text automatically. <strong>Please paste your CV text manually.</strong>';
+            statusEl.style.color = '#f59e0b';
+            sidebar.querySelector('[data-cvtab="paste"]').click();
+            return;
+          }
+
+          try {
+            // Convert PDF to base64 and send to Gemini Vision
+            const base64 = btoa(
+              new Uint8Array(e.target.result).reduce((data, byte) => data + String.fromCharCode(byte), '')
+            );
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const res = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{
+                  parts: [
+                    {
+                      inline_data: {
+                        mime_type: 'application/pdf',
+                        data: base64
+                      }
+                    },
+                    {
+                      text: 'Extract ALL text from this CV/resume exactly as written. Output only the raw text content with proper line breaks. Do not add any commentary, headers, or formatting — just the extracted text.'
+                    }
+                  ]
+                }],
+                generationConfig: { maxOutputTokens: 4000, temperature: 0 }
+              })
+            });
+
+            if (!res.ok) throw new Error('Gemini vision API error: ' + res.status);
+            const data = await res.json();
+            const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+            if (aiText && aiText.length > 100) {
+              textEl.value = aiText.trim();
+              statusEl.innerHTML = `✅ <strong>${file.name}</strong> read by AI — ${aiText.split(' ').length} words`;
+              statusEl.style.color = '#16a34a';
+              sidebar.querySelector('[data-cvtab="paste"]').click();
+              toast('CV read by AI! ✓ Check the extracted text looks correct.', 'ok');
+            } else {
+              throw new Error('No text returned from AI');
+            }
+          } catch(aiErr) {
+            console.warn('Gemini vision failed:', aiErr);
+            textEl.value = '';
+            textEl.placeholder = 'Could not auto-read this PDF. Please open your PDF, select all (Ctrl+A), copy (Ctrl+C) and paste here.';
+            statusEl.innerHTML = '⚠️ Auto-read failed. <strong>Please paste your CV text manually in the box.</strong>';
+            statusEl.style.color = '#f59e0b';
+            sidebar.querySelector('[data-cvtab="paste"]').click();
+            toast('Could not read PDF — please paste your CV text manually.', 'warn');
+          }
+        });
       };
       reader.readAsArrayBuffer(file);
       return;
     }
 
     if (file.name.endsWith('.docx')) {
-      statusEl.textContent = 'DOCX detected. For best results, copy-paste text from your Word document.';
-      toast('Paste text from Word document for best AI results.', 'warn');
+      // For DOCX: try to extract XML text content
+      statusEl.textContent = '📄 Reading DOCX...';
+      const reader2 = new FileReader();
+      reader2.onload = async e2 => {
+        try {
+          // DOCX is a ZIP — try to find word/document.xml content
+          const bytes = new Uint8Array(e2.target.result);
+          const str   = new TextDecoder('latin1').decode(bytes);
+          // Extract text from XML tags
+          const xmlMatches = str.matchAll(/<w:t[^>]*>([^<]+)<\/w:t>/g);
+          const words = [];
+          for (const m of xmlMatches) words.push(m[1]);
+          const extracted = words.join(' ').replace(/\s+/g,' ').trim();
+          if (extracted && extracted.length > 100) {
+            textEl.value = extracted;
+            statusEl.innerHTML = `✅ <strong>${file.name}</strong> extracted — ${extracted.split(' ').length} words`;
+            statusEl.style.color = '#16a34a';
+            sidebar.querySelector('[data-cvtab="paste"]').click();
+            toast('CV extracted from DOCX! ✓', 'ok');
+          } else {
+            throw new Error('Could not extract text');
+          }
+        } catch(e) {
+          textEl.placeholder = 'Could not auto-read DOCX. Open in Word → Select All (Ctrl+A) → Copy (Ctrl+C) → Paste here.';
+          statusEl.innerHTML = '⚠️ Please <strong>copy-paste text</strong> from your Word document.';
+          statusEl.style.color = '#f59e0b';
+          sidebar.querySelector('[data-cvtab="paste"]').click();
+        }
+      };
+      reader2.readAsArrayBuffer(file);
       return;
     }
 
@@ -1781,41 +1985,50 @@ ${jd.substring(0,2000)}`, 1800);
   // ════════════════════════════════════════════
   //  CLAUDE API
   // ════════════════════════════════════════════
+  // ── AI BACKEND: Google Gemini (free tier, no credit card needed) ──────────
+  // Model: gemini-2.0-flash  •  Free limits: 1,500 req/day, 1M tokens/min
+  // Get key FREE at: aistudio.google.com → "Get API key"
   async function callClaude(apiKey, prompt, maxTokens) {
-    if (!apiKey || apiKey.length < 20) throw new Error('Invalid API key. Please check Settings → Security.');
+    if (!apiKey || apiKey.length < 20) {
+      throw new Error('No API key found. Go to Settings → Security and add your Gemini key.');
+    }
+
+    const model = 'gemini-2.0-flash';
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
     let res;
     try {
-      res = await fetch('https://api.anthropic.com/v1/messages', {
+      res = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-opus-4-5',
-          max_tokens: maxTokens || 1000,
-          messages: [{ role: 'user', content: prompt }]
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            maxOutputTokens: maxTokens || 1000,
+            temperature: 0.7
+          }
         })
       });
     } catch(netErr) {
       throw new Error('Network error — check your internet connection.');
     }
+
     if (!res.ok) {
       let msg = 'API error ' + res.status;
       try {
         const d = await res.json();
-        if (d.error?.message) msg = d.error.message;
-        else if (res.status === 401) msg = 'Invalid API key. Check Settings → Security.';
-        else if (res.status === 429) msg = 'Rate limit hit. Wait a moment and try again.';
-        else if (res.status === 403) msg = 'API key does not have permission. Check your Anthropic console.';
+        if (d.error?.message)  msg = d.error.message;
+        if (res.status === 400) msg = 'Bad request — check your API key format.';
+        if (res.status === 403) msg = 'API key invalid or disabled. Check aistudio.google.com.';
+        if (res.status === 429) msg = 'Rate limit hit. Wait a moment and try again.';
       } catch(e) {}
       throw new Error(msg);
     }
+
     const d = await res.json();
     if (d.error) throw new Error(d.error.message);
-    return d.content?.[0]?.text || '';
+    // Gemini response structure
+    return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
   }
   function getApiKey(cb) {
     // Check both storage locations for backward compatibility
@@ -2099,6 +2312,162 @@ ${jdSnippet}`;
   // ════════════════════════════════════════════
   let billing='monthly', selectedPlan=null;
   const PRICES={monthly:{starter:'€2.50',pro:'€7.49',ultra:'€14.99'},annual:{starter:'€1.99',pro:'€5.99',ultra:'€11.99'}};
+
+  // ══════════════════════════════════════════════════════
+  //  PROMO CODE SYSTEM
+  //  ─────────────────────────────────────────────────────
+  //  To add a new promo code, just add an entry here:
+  //
+  //  'CODE': {
+  //    discount: 0.50,          // 50% off (0.20 = 20%, 1.0 = 100% free)
+  //    freeCredits: 100,        // bonus credits granted immediately
+  //    plan: 'pro',             // auto-upgrade to this plan (optional)
+  //    planDays: 30,            // how many days the free plan lasts
+  //    description: '50% off',  // shown to user
+  //    oneTime: true,           // if true, can only be used once per account
+  //    expiresAt: null,         // set to Date.now() + ms to expire, or null = never
+  //  }
+  // ══════════════════════════════════════════════════════
+  const PROMO_CODES = {
+    // 🎁 Launch discount — 50% off for early users
+    'LAUNCH50': {
+      discount:    0.50,
+      description: '50% off your first month!',
+      oneTime:     true,
+      expiresAt:   null
+    },
+    // 🆓 Give someone a free month of Pro
+    'FREEPRO30': {
+      discount:    1.00,
+      plan:        'pro',
+      planDays:    30,
+      freeCredits: 9999999,
+      description: '1 month of Pro — FREE!',
+      oneTime:     true,
+      expiresAt:   null
+    },
+    // 💰 Permanent 20% off — for partners/affiliates
+    'PARTNER20': {
+      discount:    0.20,
+      description: '20% off — partner discount',
+      oneTime:     false,
+      expiresAt:   null
+    },
+    // 🎓 Student discount
+    'STUDENT': {
+      discount:    0.40,
+      freeCredits: 50,
+      description: '40% off + 50 bonus credits',
+      oneTime:     true,
+      expiresAt:   null
+    },
+    // 👑 VIP users — free unlimited forever
+    'VIP2025': {
+      discount:    1.00,
+      plan:        'ultra',
+      planDays:    365,
+      freeCredits: 9999999,
+      description: 'VIP — 1 year Ultra FREE',
+      oneTime:     true,
+      expiresAt:   null
+    },
+    // 🧪 Testing — always works
+    'TEST100': {
+      discount:    1.00,
+      freeCredits: 999,
+      description: 'Test code — 100% off + 999 credits',
+      oneTime:     false,
+      expiresAt:   null
+    }
+  };
+
+  let _activePromo = null;   // currently applied promo
+
+  function applyPromoCode() {
+    const input = sidebar.querySelector('#qa-promo-input');
+    const msgEl = sidebar.querySelector('#qa-promo-msg');
+    const priceEl = sidebar.querySelector('#qa-pay-pr');
+    if (!input || !msgEl) return;
+
+    const code = input.value.trim().toUpperCase();
+    if (!code) {
+      showPromoMsg('Enter a promo code first.', false);
+      return;
+    }
+
+    const promo = PROMO_CODES[code];
+    if (!promo) {
+      showPromoMsg('❌ Invalid code. Check spelling and try again.', false);
+      _activePromo = null;
+      restoreOriginalPrice();
+      return;
+    }
+
+    // Check expiry
+    if (promo.expiresAt && Date.now() > promo.expiresAt) {
+      showPromoMsg('❌ This promo code has expired.', false);
+      return;
+    }
+
+    // Check one-time use
+    if (promo.oneTime) {
+      chrome.storage.local.get('usedPromos', ({ usedPromos }) => {
+        const used = usedPromos || [];
+        if (used.includes(code)) {
+          showPromoMsg('❌ You have already used this code.', false);
+          return;
+        }
+        applyPromoToUI(code, promo, priceEl, msgEl);
+      });
+    } else {
+      applyPromoToUI(code, promo, priceEl, msgEl);
+    }
+  }
+
+  function applyPromoToUI(code, promo, priceEl, msgEl) {
+    _activePromo = { code, ...promo };
+
+    // If it's a 100% discount or free plan upgrade — handle immediately
+    if (promo.discount >= 1.0) {
+      if (priceEl) priceEl.textContent = '€0.00';
+      showPromoMsg('✅ ' + promo.description, true);
+
+      // If it grants a free plan with no payment needed
+      if (promo.plan && promo.planDays) {
+        const grantBtn = sidebar.querySelector('#qa-pay-btn');
+        if (grantBtn) {
+          grantBtn.textContent = '🎁 Activate Free Plan';
+          grantBtn.style.background = '#16a34a';
+        }
+      }
+      return;
+    }
+
+    // Partial discount — update displayed price
+    if (selectedPlan && priceEl) {
+      const raw = PRICES[billing][selectedPlan].replace('€','');
+      const original = parseFloat(raw);
+      const discounted = (original * (1 - promo.discount)).toFixed(2);
+      priceEl.innerHTML = `<span style="text-decoration:line-through;opacity:0.5;font-size:14px">€${raw}</span> <span style="color:#16a34a">€${discounted}</span>`;
+    }
+    showPromoMsg('✅ ' + promo.description, true);
+  }
+
+  function restoreOriginalPrice() {
+    const priceEl = sidebar.querySelector('#qa-pay-pr');
+    if (priceEl && selectedPlan) priceEl.textContent = PRICES[billing][selectedPlan];
+    const btn = sidebar.querySelector('#qa-pay-btn');
+    if (btn) { btn.textContent = '🔒 Subscribe Now'; btn.style.background = ''; }
+  }
+
+  function showPromoMsg(msg, ok) {
+    const el = sidebar.querySelector('#qa-promo-msg');
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = 'block';
+    el.style.color = ok ? '#16a34a' : '#ef4444';
+    el.style.fontWeight = '600';
+  }
   const PLAN_NAMES={starter:'Starter',pro:'Pro',ultra:'Ultra'};
 
   function openPricing()  { sidebar.querySelector('#qa-pricing').classList.add('show'); loadSavedPayment(); }
@@ -2162,10 +2531,39 @@ ${jdSnippet}`;
     const parts=expiry.replace(/\s/g,'').split('/');
     const btn=sidebar.querySelector('#qa-pay-btn');
     btn.disabled=true; btn.textContent='Processing...';
+
+    // Handle 100% free promo (no Stripe needed)
+    if (_activePromo?.discount >= 1.0 && _activePromo?.plan) {
+      const freeCredits = _activePromo.freeCredits || 9999999;
+      const planDays = _activePromo.planDays || 30;
+      const subEnd = Date.now() + planDays * 24*60*60*1000;
+      // Mark promo as used
+      chrome.storage.local.get('usedPromos', ({usedPromos}) => {
+        const used = usedPromos || [];
+        if (!used.includes(_activePromo.code)) used.push(_activePromo.code);
+        chrome.storage.local.set({
+          usedPromos: used,
+          plan: _activePromo.plan,
+          credits: freeCredits,
+          creditsDate: new Date().toDateString(),
+          subscriptionEnd: subEnd
+        }, () => {
+          updateCreditUI(); checkRenewal(); updateBillingSection();
+          showPayMsg('🎉 ' + _activePromo.description + ' — Plan activated!', true);
+          setTimeout(() => closePricing(), 3000);
+          toast('🎁 ' + _activePromo.plan.toUpperCase() + ' plan activated!', 'ok');
+          _activePromo = null;
+        });
+      });
+      btn.disabled = false; btn.textContent = '🔒 Subscribe Now';
+      return;
+    }
+
     try {
+      const promoCode = _activePromo?.code || null;
       const res=await fetch(SERVER+'/api/create-subscription',{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({card:{number:cardNum,exp_month:parts[0],exp_year:parts[1]?'20'+parts[1]:'',cvc},plan:selectedPlan,billing,email,name,extensionUserId:chrome.runtime?.id||'ext'})
+        body:JSON.stringify({card:{number:cardNum,exp_month:parts[0],exp_year:parts[1]?'20'+parts[1]:'',cvc},plan:selectedPlan,billing,email,name,promoCode,extensionUserId:chrome.runtime?.id||'ext'})
       });
       const data=await res.json();
       if (data.error) { showPayMsg('Payment failed: '+data.error,false); btn.disabled=false; btn.textContent='🔒 Subscribe Now'; return; }
