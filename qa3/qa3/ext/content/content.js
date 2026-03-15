@@ -22,6 +22,51 @@
   // ════════════════════════════════════════════
   const sidebar = document.createElement('div');
   sidebar.id = 'qa-sidebar';
+
+  // ── Resize handle (drag left edge to resize) ──
+  const resizeHandle = document.createElement('div');
+  resizeHandle.id = 'qa-resize-handle';
+  resizeHandle.title = 'Drag to resize';
+  document.body.appendChild(resizeHandle);
+
+  let _isResizing = false;
+  let _startX = 0, _startW = 0;
+
+  resizeHandle.addEventListener('mousedown', e => {
+    _isResizing = true;
+    _startX = e.clientX;
+    _startW = parseInt(getComputedStyle(sidebar).width, 10);
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'ew-resize';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!_isResizing) return;
+    const delta = _startX - e.clientX; // dragging left = bigger
+    const newW  = Math.min(800, Math.max(340, _startW + delta));
+    sidebar.style.width    = newW + 'px';
+    sidebar.style.right    = '0px';
+    resizeHandle.style.right = newW + 'px';
+    // Save preference
+    localStorage.setItem('qa_sidebar_width', newW);
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (_isResizing) {
+      _isResizing = false;
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+    }
+  });
+
+  // Restore saved width
+  const savedW = localStorage.getItem('qa_sidebar_width');
+  if (savedW) {
+    sidebar.style.width = savedW + 'px';
+    resizeHandle.style.right = savedW + 'px';
+  }
+
   sidebar.innerHTML = `
 
   <!-- LOGIN SCREEN -->
@@ -63,10 +108,21 @@
 
       <!-- FORGOT FORM -->
       <div id="qa-form-forgot" style="width:100%;display:none">
-        <p style="font-size:12px;color:#6b7280;margin-bottom:12px;text-align:center">Enter your email and we'll send reset instructions.</p>
+        <p style="font-size:12px;color:#6b7280;margin-bottom:12px;text-align:center">Enter your email and we'll send a reset code.</p>
         <div class="qa-field"><label>Email</label><input type="email" id="qa-f-email" placeholder="jane@example.com"/></div>
-        <button class="qa-btn qa-btn-green" id="qa-forgot-btn">Send Reset Email</button>
+        <button class="qa-btn qa-btn-green" id="qa-forgot-btn">Send Reset Code</button>
         <p class="qa-auth-switch"><span class="qa-link" id="qa-to-login2">← Back to sign in</span></p>
+      </div>
+
+      <!-- RESET CODE FORM -->
+      <div id="qa-form-resetcode" style="width:100%;display:none">
+        <p style="font-size:12px;color:#6b7280;margin-bottom:12px;text-align:center">Enter the reset code sent to your email.</p>
+        <input type="hidden" id="qa-rc-email"/>
+        <div class="qa-field"><label>Reset Code</label><input id="qa-rc-code" placeholder="e.g. A3X7KP2M" style="text-transform:uppercase;letter-spacing:2px;font-weight:700"/></div>
+        <div class="qa-field"><label>New Password</label><input type="password" id="qa-rc-pass" placeholder="Min 8 characters"/></div>
+        <div class="qa-field"><label>Confirm Password</label><input type="password" id="qa-rc-pass2" placeholder="Repeat password"/></div>
+        <button class="qa-btn qa-btn-green" id="qa-reset-code-btn">Set New Password</button>
+        <p class="qa-auth-switch"><span class="qa-link" id="qa-to-forgot-back">← Request new code</span></p>
       </div>
     </div>
   </div>
@@ -281,15 +337,36 @@
 
       <!-- TRACKER TAB -->
       <div class="qa-panel" id="qa-p-tracker">
-        <div class="qa-stats">
-          <div class="qa-stat"><div class="qa-stat-num" id="qa-s-all">0</div><div class="qa-stat-lbl">Applied</div></div>
-          <div class="qa-stat"><div class="qa-stat-num" id="qa-s-int">0</div><div class="qa-stat-lbl">Interview</div></div>
-          <div class="qa-stat"><div class="qa-stat-num" id="qa-s-off">0</div><div class="qa-stat-lbl">Offer</div></div>
-          <div class="qa-stat"><div class="qa-stat-num" id="qa-s-rej">0</div><div class="qa-stat-lbl">Rejected</div></div>
+        <!-- Status filter tabs (like LetMeApply) -->
+        <div class="qa-tracker-tabs">
+          <button class="qa-ttab qa-active" data-status="all">Applied <span class="qa-ttab-count" id="qa-tc-all">0</span></button>
+          <button class="qa-ttab" data-status="interview">Interviewing <span class="qa-ttab-count" id="qa-tc-int">0</span></button>
+          <button class="qa-ttab" data-status="offer">Offer <span class="qa-ttab-count" id="qa-tc-off">0</span></button>
+          <button class="qa-ttab" data-status="rejected">Rejected <span class="qa-ttab-count" id="qa-tc-rej">0</span></button>
+          <button class="qa-ttab" data-status="favorites">⭐ <span class="qa-ttab-count" id="qa-tc-fav">0</span></button>
         </div>
-        <div style="font-size:10px;color:#9ca3af;margin-bottom:8px">Click a status badge to cycle through stages</div>
+
+        <!-- Search bar -->
+        <div class="qa-tracker-search">
+          <span style="font-size:13px;color:#9ca3af">🔍</span>
+          <input id="qa-tracker-search" placeholder="Search by title, company or location..." class="qa-tracker-search-input"/>
+        </div>
+
+        <!-- Table header -->
+        <div class="qa-tracker-hdr">
+          <span style="flex:2">Position / Role</span>
+          <span style="flex:1.2">Company</span>
+          <span style="flex:1">Applied on</span>
+          <span style="flex:1">Stage</span>
+        </div>
+
+        <!-- Job list -->
         <div class="qa-jlist" id="qa-jlist"><div class="qa-empty">No applications yet. Start applying! 🎯</div></div>
-        <div style="margin-top:10px"><button class="qa-btn qa-btn-danger" id="qa-clear-btn">🗑 Clear History</button></div>
+
+        <!-- Bottom actions -->
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <button class="qa-btn qa-btn-danger" style="flex:1;font-size:11px" id="qa-clear-btn">🗑 Clear All</button>
+        </div>
       </div>
 
       <!-- SETTINGS TAB -->
@@ -349,15 +426,15 @@
             <div class="qa-flash" id="qa-pw-flash" style="margin-top:8px"></div>
           </div>
           <div class="qa-sec-card" style="margin-top:10px">
-            <div class="qa-sec-card-title">AI Configuration <span style="background:#dcfce7;color:#16a34a;font-size:9px;padding:2px 7px;border-radius:20px;font-weight:700;margin-left:6px">FREE</span></div>
+            <div class="qa-sec-card-title">AI Configuration</div>
             <div class="qa-field" style="margin-top:8px">
               <label style="display:flex;align-items:center;justify-content:space-between">
-                Gemini API Key (FREE)
+                Anthropic API Key
                 <span id="qa-api-status" style="font-size:10px;font-weight:700"></span>
               </label>
-              <input type="password" id="qa-ak" placeholder="AIza... (Gemini API key)"/>
+              <input type="password" id="qa-ak" placeholder="sk-ant-api03-..."/>
             </div>
-            <div class="qa-api-note">Get your FREE key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:#16a34a;font-weight:700">aistudio.google.com</a> · Free tier: 1,500 requests/day · No credit card needed</div>
+            <div class="qa-api-note">Get your key at <a href="https://console.anthropic.com/settings/api-keys" target="_blank" style="color:#16a34a;font-weight:700">console.anthropic.com</a> · New accounts get $5 free credit</div>
             <div style="display:flex;gap:8px;margin-top:8px">
               <button class="qa-btn qa-btn-outline" style="flex:1" id="qa-save-api-btn">💾 Save API Key</button>
               <button class="qa-btn qa-btn-outline" style="flex:1" id="qa-test-api-btn">🧪 Test Key</button>
@@ -707,13 +784,17 @@
     // ── Auth navigation ──────────────────────────
     const $ = id => sidebar.querySelector('#'+id);
     function showForm(name) {
-      ['qa-form-login','qa-form-signup','qa-form-forgot'].forEach(id => $(id).style.display = 'none');
-      $('qa-form-'+name).style.display = 'block';
-      $('qa-login-err').style.display  = 'none';
+      ['qa-form-login','qa-form-signup','qa-form-forgot','qa-form-resetcode'].forEach(id => {
+        const el = $(id); if (el) el.style.display = 'none';
+      });
+      const target = $('qa-form-'+name);
+      if (target) target.style.display = 'block';
+      $('qa-login-err').style.display = 'none';
     }
     $('qa-to-signup').addEventListener('click',  () => showForm('signup'));
     $('qa-to-login').addEventListener('click',   () => showForm('login'));
-    $('qa-to-login2').addEventListener('click',  () => showForm('login'));
+    $('qa-to-login2').addEventListener('click',   () => showForm('login'));
+    $('qa-to-forgot-back') && $('qa-to-forgot-back').addEventListener('click', () => showForm('forgot'));
     $('qa-to-forgot').addEventListener('click',  () => showForm('forgot'));
     $('qa-auth-close').addEventListener('click', () => sidebar.classList.remove('qa-open'));
     $('qa-app-close').addEventListener('click',  () => sidebar.classList.remove('qa-open'));
@@ -827,6 +908,22 @@
     // ── Tracker tab ──────────────────────────────
     $('qa-clear-btn').addEventListener('click', clearTracker);
 
+    // Tracker tab filters
+    sidebar.querySelectorAll('.qa-ttab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        sidebar.querySelectorAll('.qa-ttab').forEach(b => b.classList.remove('qa-active'));
+        btn.classList.add('qa-active');
+        _trackerFilter = btn.dataset.status;
+        loadTracker();
+      });
+    });
+
+    // Tracker search
+    $('qa-tracker-search') && $('qa-tracker-search').addEventListener('input', e => {
+      _trackerSearch = e.target.value.trim();
+      loadTracker();
+    });
+
     // ── Settings sub-nav ─────────────────────────
     sidebar.querySelectorAll('.qa-snav-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -895,10 +992,10 @@
         setTimeout(()=>f.classList.remove('show'),2500);
         return;
       }
-      if (!key.startsWith('AIza') && !key.startsWith('AIza')) {
+      if (!key.startsWith('sk-ant')) {
         // Gemini keys start with AIza — just warn, still save
         const f=$('qa-api-flash');
-        f.textContent='Tip: Gemini keys usually start with AIza...';
+        f.textContent='Anthropic keys start with sk-ant-... — check console.anthropic.com';
         f.className='qa-flash qa-flash-err show';
         setTimeout(()=>f.classList.remove('show'),3000);
       }
@@ -921,7 +1018,7 @@
       btn.disabled = true; btn.textContent = '⏳ Testing...';
       try {
         const result = await callClaude(key, 'Reply with exactly: OK', 10);
-        flash.textContent = '✅ Gemini key works! All AI features ready.';
+        flash.textContent = '✅ Anthropic key works! All AI features ready.';
         flash.className = 'qa-flash qa-flash-ok show';
         $('qa-api-status').textContent = '✅ Valid';
         $('qa-api-status').style.color = '#16a34a';
@@ -930,7 +1027,7 @@
           chrome.storage.local.set({ settings: {...(settings||{}), apiKey: key}, apiKey: key });
         });
       } catch(e) {
-        flash.textContent = '❌ ' + e.message + ' — Make sure you copied the full key from aistudio.google.com';
+        flash.textContent = '❌ ' + e.message;
         flash.className = 'qa-flash qa-flash-err show';
         $('qa-api-status').textContent = '❌ Invalid';
         $('qa-api-status').style.color = '#ef4444';
@@ -1650,31 +1747,40 @@ ${jd.substring(0,2000)}`, 1800);
               new Uint8Array(e.target.result).reduce((data, byte) => data + String.fromCharCode(byte), '')
             );
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            const res = await fetch(url, {
+            const res = await fetch('https://api.anthropic.com/v1/messages', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': apiKey,
+                'anthropic-version': '2023-06-01',
+                'anthropic-dangerous-direct-browser-access': 'true'
+              },
               body: JSON.stringify({
-                contents: [{
-                  parts: [
+                model: 'claude-haiku-4-5-20251001',
+                max_tokens: 4000,
+                messages: [{
+                  role: 'user',
+                  content: [
                     {
-                      inline_data: {
-                        mime_type: 'application/pdf',
+                      type: 'document',
+                      source: {
+                        type: 'base64',
+                        media_type: 'application/pdf',
                         data: base64
                       }
                     },
                     {
+                      type: 'text',
                       text: 'Extract ALL text from this CV/resume exactly as written. Output only the raw text content with proper line breaks. Do not add any commentary, headers, or formatting — just the extracted text.'
                     }
                   ]
-                }],
-                generationConfig: { maxOutputTokens: 4000, temperature: 0 }
+                }]
               })
             });
 
-            if (!res.ok) throw new Error('Gemini vision API error: ' + res.status);
+            if (!res.ok) throw new Error('Anthropic vision API error: ' + res.status);
             const data = await res.json();
-            const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            const aiText = data.content?.[0]?.text || '';
 
             if (aiText && aiText.length > 100) {
               textEl.value = aiText.trim();
@@ -1985,28 +2091,29 @@ ${jd.substring(0,2000)}`, 1800);
   // ════════════════════════════════════════════
   //  CLAUDE API
   // ════════════════════════════════════════════
-  // ── AI BACKEND: Google Gemini (free tier, no credit card needed) ──────────
-  // Model: gemini-2.0-flash  •  Free limits: 1,500 req/day, 1M tokens/min
-  // Get key FREE at: aistudio.google.com → "Get API key"
+  // ── AI BACKEND: Anthropic Claude ──────────────────────────────────────────
+  // Model: claude-haiku-4-5-20251001  (fast + affordable)
+  // Get key at: console.anthropic.com → API Keys
+  // New accounts get $5 free credit (~2,500+ actions)
   async function callClaude(apiKey, prompt, maxTokens) {
     if (!apiKey || apiKey.length < 20) {
-      throw new Error('No API key found. Go to Settings → Security and add your Gemini key.');
+      throw new Error('No API key found. Go to Settings → Security and add your Anthropic key.');
     }
-
-    const model = 'gemini-2.0-flash';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
     let res;
     try {
-      res = await fetch(url, {
+      res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            maxOutputTokens: maxTokens || 1000,
-            temperature: 0.7
-          }
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: maxTokens || 1000,
+          messages: [{ role: 'user', content: prompt }]
         })
       });
     } catch(netErr) {
@@ -2017,9 +2124,9 @@ ${jd.substring(0,2000)}`, 1800);
       let msg = 'API error ' + res.status;
       try {
         const d = await res.json();
-        if (d.error?.message)  msg = d.error.message;
-        if (res.status === 400) msg = 'Bad request — check your API key format.';
-        if (res.status === 403) msg = 'API key invalid or disabled. Check aistudio.google.com.';
+        if (d.error?.message) msg = d.error.message;
+        if (res.status === 401) msg = 'Invalid API key. Check Settings → Security.';
+        if (res.status === 403) msg = 'Account needs billing setup at console.anthropic.com/settings/billing';
         if (res.status === 429) msg = 'Rate limit hit. Wait a moment and try again.';
       } catch(e) {}
       throw new Error(msg);
@@ -2027,8 +2134,7 @@ ${jd.substring(0,2000)}`, 1800);
 
     const d = await res.json();
     if (d.error) throw new Error(d.error.message);
-    // Gemini response structure
-    return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    return d.content?.[0]?.text || '';
   }
   function getApiKey(cb) {
     // Check both storage locations for backward compatibility
@@ -2275,36 +2381,107 @@ ${jdSnippet}`;
   // ════════════════════════════════════════════
   //  TRACKER
   // ════════════════════════════════════════════
-  const STATUSES=['applied','interview','offer','rejected'];
-  const STAT_LBL={applied:'Applied',interview:'Interview',offer:'Offer',rejected:'Rejected'};
-  const PLT_ICO={LinkedIn:'💼',Indeed:'🔍',Glassdoor:'💚',Greenhouse:'🌿',Lever:'⚙️',Workday:'🔷'};
+  const STATUSES = ['applied','interview','offer','rejected','archived'];
+  const STAT_LBL = { applied:'APPLIED', interview:'INTERVIEWING', offer:'OFFER RECEIVED', rejected:'REJECTED', archived:'ARCHIVED' };
+  const STAT_COLOR = { applied:'#16a34a', interview:'#2563eb', offer:'#9333ea', rejected:'#ef4444', archived:'#9ca3af' };
+  let _trackerFilter = 'all';
+  let _trackerSearch = '';
 
   function loadTracker() {
-    chrome.storage.local.get('applications',({applications})=>{
-      const apps=applications||[];
-      sidebar.querySelector('#qa-s-all').textContent=apps.length;
-      sidebar.querySelector('#qa-s-int').textContent=apps.filter(a=>a.status==='interview').length;
-      sidebar.querySelector('#qa-s-off').textContent=apps.filter(a=>a.status==='offer').length;
-      sidebar.querySelector('#qa-s-rej').textContent=apps.filter(a=>a.status==='rejected').length;
-      const list=sidebar.querySelector('#qa-jlist');
-      if (!apps.length) { list.innerHTML='<div class="qa-empty">No applications yet. Start applying! 🎯</div>'; return; }
-      list.innerHTML=apps.slice().reverse().slice(0,25).map((app,i)=>{
-        const idx=apps.length-1-i,s=app.status||'applied';
-        const dt=new Date(app.date).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-        return `<div class="qa-jitem"><div class="qa-jico">${PLT_ICO[app.platform]||'📋'}</div><div class="qa-jinfo"><div class="qa-jtitle">${app.title||'Job Application'}</div><div class="qa-jmeta">${app.company||app.platform} · ${dt}</div></div><span class="qa-jtag qa-t-${s}" data-idx="${idx}">${STAT_LBL[s]}</span></div>`;
+    chrome.storage.local.get('applications', ({ applications }) => {
+      const apps = applications || [];
+      const favs = apps.filter(a => a.favorite);
+
+      // Update tab counts
+      const $ = id => sidebar.querySelector('#' + id);
+      if ($('qa-tc-all'))  $('qa-tc-all').textContent  = apps.filter(a=>!a.status||a.status==='applied').length;
+      if ($('qa-tc-int'))  $('qa-tc-int').textContent  = apps.filter(a=>a.status==='interview').length;
+      if ($('qa-tc-off'))  $('qa-tc-off').textContent  = apps.filter(a=>a.status==='offer').length;
+      if ($('qa-tc-rej'))  $('qa-tc-rej').textContent  = apps.filter(a=>a.status==='rejected').length;
+      if ($('qa-tc-fav'))  $('qa-tc-fav').textContent  = favs.length;
+
+      // Filter by tab
+      let filtered = apps.slice();
+      if (_trackerFilter === 'all')        filtered = apps.filter(a => !a.status || a.status === 'applied');
+      else if (_trackerFilter === 'favorites') filtered = apps.filter(a => a.favorite);
+      else                                  filtered = apps.filter(a => a.status === _trackerFilter);
+
+      // Apply search
+      if (_trackerSearch) {
+        const q = _trackerSearch.toLowerCase();
+        filtered = filtered.filter(a =>
+          (a.title||'').toLowerCase().includes(q) ||
+          (a.company||'').toLowerCase().includes(q) ||
+          (a.location||'').toLowerCase().includes(q)
+        );
+      }
+
+      const list = sidebar.querySelector('#qa-jlist');
+      if (!filtered.length) {
+        list.innerHTML = `<div class="qa-empty">${apps.length ? 'No applications match this filter.' : 'No applications yet. Start applying! 🎯'}</div>`;
+        return;
+      }
+
+      // Render as LetMeApply table rows
+      list.innerHTML = filtered.slice().reverse().map((app, i) => {
+        const realIdx = apps.indexOf(app);
+        const s   = app.status || 'applied';
+        const dt  = new Date(app.date).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+        const time = new Date(app.date).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+        const isFav = app.favorite ? '⭐' : '🤍';
+        const url = app.url ? `href="${app.url}" target="_blank"` : '';
+        const stageOpts = Object.entries(STAT_LBL).map(([v,l]) =>
+          `<option value="${v}" ${v===s?'selected':''}>${l}</option>`
+        ).join('');
+        return `<div class="qa-tracker-row">
+          <div class="qa-tr-main">
+            <div class="qa-tr-fav" data-idx="${realIdx}">${isFav}</div>
+            <div class="qa-tr-info">
+              <a class="qa-tr-title" ${url}>${app.title || 'Job Application'}</a>
+              <div class="qa-tr-meta">${app.company||''} ${app.location?'· '+app.location:''}</div>
+            </div>
+          </div>
+          <div class="qa-tr-date">
+            <div style="color:#16a34a;font-size:10px;font-weight:600;background:#f0fdf4;padding:3px 8px;border-radius:20px;white-space:nowrap">${dt}, ${time}</div>
+          </div>
+          <div class="qa-tr-stage">
+            <select class="qa-stage-sel" data-idx="${realIdx}" style="border-color:${STAT_COLOR[s]}20;color:${STAT_COLOR[s]}">
+              ${stageOpts}
+            </select>
+          </div>
+        </div>`;
       }).join('');
-      list.querySelectorAll('.qa-jtag').forEach(tag=>{
-        tag.addEventListener('click',()=>{
-          const idx=parseInt(tag.dataset.idx),a2=[...apps];
-          a2[idx].status=STATUSES[(STATUSES.indexOf(a2[idx].status||'applied')+1)%STATUSES.length];
-          chrome.storage.local.set({applications:a2},loadTracker);
+
+      // Wire favorite toggles
+      list.querySelectorAll('.qa-tr-fav').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.idx);
+          const a2  = [...apps];
+          a2[idx].favorite = !a2[idx].favorite;
+          chrome.storage.local.set({ applications: a2 }, loadTracker);
+        });
+      });
+
+      // Wire stage dropdowns
+      list.querySelectorAll('.qa-stage-sel').forEach(sel => {
+        sel.addEventListener('change', () => {
+          const idx = parseInt(sel.dataset.idx);
+          const a2  = [...apps];
+          a2[idx].status = sel.value;
+          sel.style.color      = STAT_COLOR[sel.value] || '#374151';
+          sel.style.borderColor = (STAT_COLOR[sel.value]||'#e5e7eb') + '40';
+          chrome.storage.local.set({ applications: a2 }, () => {
+            loadTracker();
+            updateStats();
+          });
         });
       });
     });
   }
 
   function clearTracker() {
-    if (confirm('Clear all application history? Cannot be undone.')) chrome.storage.local.remove('applications',loadTracker);
+    if (confirm('Clear all application history? Cannot be undone.'))
+      chrome.storage.local.remove('applications', loadTracker);
   }
 
   // ════════════════════════════════════════════
